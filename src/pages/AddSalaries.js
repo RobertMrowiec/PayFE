@@ -9,6 +9,11 @@ import Button from 'material-ui/Button';
 import { Redirect } from 'react-router-dom';
 import { ListItemText } from 'material-ui/List';
 import { log } from 'util';
+import { Link } from 'react-router-dom';
+import { FormGroup, FormControlLabel } from 'material-ui/Form';
+import Checkbox from 'material-ui/Checkbox';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const styles = {
   container: {
@@ -24,6 +29,8 @@ const styles = {
   },
   div: {
     margin: 'auto',
+    marginLeft: '44.5%',
+    marginTop:'-6%',
     width: '15%',
     padding: '10px'
   },
@@ -44,18 +51,17 @@ class AddSalaries extends React.Component {
       userId:'',
       projectId: '',
       projects: [],
-      users: []
-    }
+      users: [],
+      selectedDate: new Date()
+    } 
   }
 
   componentDidMount() {
-    fetch('https://reactmanagebe.herokuapp.com/api/projects')
+    fetch('https://reactmanagebe.herokuapp.com/api/projects', {credentials: 'include'})
       .then( response => response.json())
-      .then( projects => this.setState({projects: projects}))
-      .then( () => {
-        fetch('https://reactmanagebe.herokuapp.com/api/users')
-          .then(response => response.json())
-          .then( users => this.setState({users: users}))
+      .then( projects => this.setState({projects: projects.projects.sort((a,b) => a.name > b.name)}))
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
       })
   }
 
@@ -77,10 +83,75 @@ class AddSalaries extends React.Component {
     });
   };
 
+  handleChangeCheckbox = name => event => {
+    this.setState({ [name]: event.target.checked });
+  };
+
+  handleChangeProject = name => event => {
+    this.setState({[name]: event.target.value})
+    return fetch('https://reactmanagebe.herokuapp.com/api/users/projects/' + event.target.value, {
+      credentials: 'include'
+      }).then(response => response.json())
+        .then(data => {
+          this.setState({users: data.sort((a,b) => a.name > b.name)})
+        })
+  };
+
+  changeDescription = value => {
+    this.setState({ description: value })
+  }
+
+  disableUserForm() {
+    if (this.state.users && this.state.users.length > 0){
+      return (
+        <FormControl  style={{minWidth:166, maxWidth: 166}}>
+          <InputLabel htmlFor="users-simple"> Odbiorca </InputLabel>
+          <Select
+            value={this.state.userId}
+            onChange={this.handleChange('userId')}
+            inputProps={{
+              name: 'users',
+              id: 'users-simple',
+            }}
+          >
+            {this.state.users.map(user => (
+              <MenuItem key = {user._id} value = {user._id}>
+                <ListItemText primary = {user.name + ' ' + user.surname} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      )
+    }
+    else {
+      return (
+        <FormControl style={{minWidth:166, maxWidth: 166}}>
+          <InputLabel htmlFor="users-simple"> Odbiorca </InputLabel>
+          <Select
+            value={this.state.userId}
+            onChange={this.handleChange('userId')}
+            inputProps={{
+              name: 'users',
+              id: 'users-simple',
+            }}
+            disabled="true"
+          >
+          </Select>
+        </FormControl>
+      )
+    }
+  }
+
   render() {
 
     const { redirect } = this.state
+    const { redirectLogin } = this.state
 
+    if (redirectLogin) {
+      return (
+        <Redirect to={{pathname: '/login' }}/>
+      )
+    }
     if (redirect) {
       return (
         <Redirect to={{pathname: '/app/salaries' }}/>
@@ -91,7 +162,14 @@ class AddSalaries extends React.Component {
       this.setState({
         open: true,
       });
-      setTimeout(() => {this.setState({redirect: true})}, 1000)
+      setTimeout(() => {this.setState({redirect: true})}, 1500)
+    }
+
+    let changeSnackBarMoney = () => {
+      this.setState({
+        openMoneyError: true,
+      });
+      setTimeout(() => {this.setState({redirect: true})}, 1500)
     }
 
     let changeSnackBarToError = () => {
@@ -100,16 +178,33 @@ class AddSalaries extends React.Component {
       });
     }
 
+    let changeSnackBarToAmount = () => {
+      this.setState({
+        openAmountError: true,
+      });
+    }
+
+    let changeSnackBarToUser = () => {
+      this.setState({
+        openUserError: true,
+      });
+    }
+
     let object = {
       title: this.state.title,
+      potentially: this.state.potentially || false,
       amount: this.state.amount,
       userId: this.state.userId,
-      projectId: this.state.projectId
+      projectId: this.state.projectId || null,
+      description: this.state.description || ''
     }
 
     let doSomething = () => {
-      fetch('https://reactmanagebe.herokuapp.com/api/salaries',
+      if (!object.userId) return changeSnackBarToUser()
+      if (!object.amount) return changeSnackBarToAmount()
+      fetch('https://reactmanagebe.herokuapp.com/api/salaries', 
         {
+          credentials: 'include',
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
@@ -117,13 +212,12 @@ class AddSalaries extends React.Component {
           method: "POST",
           body: JSON.stringify(object)
         }
-      ).then(response => {
-        if (!response.ok){
-          throw Error(response.statusText)
-        }
-        return response
-      }).then(changeSnackBar)
-        .catch(changeSnackBarToError)
+      ).then(response => response.json())
+      .then(response => {
+          if (response.message === 'No money') return changeSnackBarMoney()
+          else if (response === "Done") return changeSnackBar()
+          else return changeSnackBarToError()
+      })
     }
 
     return (
@@ -135,11 +229,12 @@ class AddSalaries extends React.Component {
           margin="normal"
           onChange={this.handleChange('title')}
         />
-        
+
         <TextField
           id="amount"
           label="Kwota"
           type="number"
+          required="true"
           InputLabelProps={{
             shrink: true
           }}
@@ -148,11 +243,11 @@ class AddSalaries extends React.Component {
         />
 
 
-        <FormControl  style={{minWidth:166, maxWidth: 166}}>
+        <FormControl style={{minWidth:166, maxWidth: 166}}>
           <InputLabel htmlFor="projects-simple"> Projekt </InputLabel>
           <Select
             value={this.state.projectId}
-            onChange={this.handleChange('projectId')}
+            onChange={this.handleChangeProject('projectId')}
             inputProps={{
               name: 'projects',
               id: 'projects-simple',
@@ -165,27 +260,29 @@ class AddSalaries extends React.Component {
             ))}
           </Select>
         </FormControl>
+        
+        {this.disableUserForm()}
 
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={this.state.potentially}
+              onChange={this.handleChangeCheckbox('potentially')}
+              value="potentially"
+              color="primary"
+            />
+          }
+          label="Potencjalna"
+        />
 
-        <FormControl  style={{minWidth:166, maxWidth: 166}}>
-          <InputLabel htmlFor="users-simple"> Odbiorca </InputLabel>
-          <Select
-            value={this.state.userId}
-            onChange={this.handleChange('userId')}
-            inputProps={{
-              name: 'users',
-              id: 'users-simple',
-            }}
-          >
-            {this.state.users.map(user => (
-              <MenuItem key = {user.id} value = {user._id}>
-                <ListItemText primary = {user.name} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <div style={{marginLeft:'-220px', minWidth:'620px', maxWidth:'620px'}}>
+          <ReactQuill 
+            value={this.state.description || ''}
+            onChange={this.changeDescription}
+          />
+        </div>
 
-        <Button raised color="primary" style={{marginLeft:'4.7%', marginTop:'10px'}} onClick={doSomething}>
+        <Button color="primary" style={{marginLeft:'4.7%', marginTop:'10px'}} onClick={doSomething}>
             Dodaj wypłatę
           </Button>
       
@@ -199,6 +296,27 @@ class AddSalaries extends React.Component {
           <Snackbar
             open={this.state.openError}
             message="Błąd podczas dodawania"
+            autoHideDuration={2000}
+            onClose={this.handleRequestClose}
+          />
+
+          <Snackbar
+            open={this.state.openAmountError}
+            message="Nie wpisano kwoty"
+            autoHideDuration={1000}
+            onClose={this.handleRequestClose}
+          />
+
+          <Snackbar
+            open={this.state.openUserError}
+            message="Nie wybrano programisty"
+            autoHideDuration={2000}
+            onClose={this.handleRequestClose}
+          />
+
+          <Snackbar
+            open={this.state.openMoneyError}
+            message="Brak pieniędzy w projekcie"
             autoHideDuration={2000}
             onClose={this.handleRequestClose}
           />

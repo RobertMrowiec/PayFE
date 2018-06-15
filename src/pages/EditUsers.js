@@ -22,16 +22,14 @@ const styles = {
   },
   div: {
     margin: 'auto',
-    width: '15%',
-    padding: '10px'
+    width: '11%',
+    marginTop: '-6%'
   },
   customWidth: {
     margin: 'auto',
     width: '100%'
   }
 };
-
-const tab = ['asd']
 
 class EditUser extends React.Component {
   constructor(props) {
@@ -48,7 +46,7 @@ class EditUser extends React.Component {
   }
 
   componentDidMount() {
-    fetch('https://reactmanagebe.herokuapp.com/api/users/' + this.props.match.params.id)
+    fetch('https://reactmanagebe.herokuapp.com/api/users/' + this.props.match.params.id, {credentials: 'include'})
       .then( response => response.json())
       .then( data => this.setState({
         name: data.name,
@@ -57,9 +55,12 @@ class EditUser extends React.Component {
         projects: data.projects
       }))
       .then(() => {
-        fetch('https://reactmanagebe.herokuapp.com/api/projects')
+        fetch('https://reactmanagebe.herokuapp.com/api/projects', {credentials: 'include'})
           .then( response => response.json())
-          .then( projectData => this.setState({values: projectData}))
+          .then( projectData => this.setState({values: projectData.projects}))
+      })
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
       })
   }
 
@@ -76,12 +77,7 @@ class EditUser extends React.Component {
   };
 
   handleProjectChange = event => {
-    // if (event.target.value != this.state.projects) {
-      console.log(event.target.value)
-      console.log(this.state.projects)
-      
-      this.setState({ projects: event.target.value });
-    // }
+    this.setState({ projects: event.target.value });
   };
 
   handleChange = name => event => {
@@ -93,7 +89,13 @@ class EditUser extends React.Component {
   render() {
 
     const { redirect } = this.state
+    const { redirectLogin } = this.state
 
+    if (redirectLogin) {
+      return (
+        <Redirect to={{pathname: '/login' }}/>
+      )
+    }
     if (redirect) {
       return (
         <Redirect to={{pathname: '/app/users' }}/>
@@ -117,10 +119,10 @@ class EditUser extends React.Component {
       name: this.state.name,
       surname: this.state.surname,
       email: this.state.email,
+      password: this.state.password,
       projects: this.state.projects
     }
     let Edit = () => {
-      console.log(object);
       fetch('https://reactmanagebe.herokuapp.com/api/users/' + this.props.match.params.id,
         {
           headers: {
@@ -128,6 +130,7 @@ class EditUser extends React.Component {
             'Content-Type': 'application/json'
           },
           method: "PUT",
+          credentials: 'include',
           body: JSON.stringify(object)
         }
       ).then(response => {
@@ -140,11 +143,10 @@ class EditUser extends React.Component {
     }
     
     let Cancel = () => {
-     {this.setState({redirect: true})}
+      {this.setState({redirect: true})}
     }
     
     let doSomething = () => {
-      console.log(object);
       fetch('https://reactmanagebe.herokuapp.com/api/users',
         {
           headers: {
@@ -152,6 +154,7 @@ class EditUser extends React.Component {
             'Content-Type': 'application/json'
           },
           method: "POST",
+          credentials: 'include',
           body: JSON.stringify(object)
         }
       ).then(response => {
@@ -167,69 +170,58 @@ class EditUser extends React.Component {
 
         <TextField
           id="name"
-          label="Imie"
-          placeholder={this.state.name}
+          label={this.state.name}
+          placeholder="Imie"
           margin="normal"
           onChange={this.handleChange('name')}
         />
 
         <TextField
           id="surname"
-          label="Nazwisko"
-          placeholder={this.state.surname}
+          label={this.state.surname}
+          placeholder="Nazwisko"
           margin="normal"
           onChange={this.handleChange('surname')}
         />
 
         <TextField
           id="email"
-          label="Email"
-          placeholder={this.state.email}
+          label={this.state.email}
+          placeholder="Email"
           margin="normal"
           onChange={this.handleChange('email')}
         />
 
-        <FormControl style={styles.formControl}>
+        <TextField
+          id="password"
+          label="Hasło"
+          type="password"
+          margin="normal"
+          onChange={this.handleChange('password')}
+        />
 
-        <InputLabel htmlFor="name-multiple">Projekty</InputLabel>
-          <Select
-            multiple
-            value={this.state.projects}
-            onChange={this.handleProjectChange}
-            input={<Input id="name-multiple"/>}
-            style={{maxWidth:"200px", minWidth: "200px"}}
-          >
-            {this.state.values.map(value => (
-              <MenuItem
-                key={value.name}
-                value={value._id}
-              >
-                {value.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-          
-          <Button raised color="primary" style={{marginLeft:'unset', marginTop:'10px'}} onClick={Cancel}>
-            Cofnij
-          </Button>
-          <Button raised color="primary" style={{marginLeft:'4.7%', marginTop:'10px'}} onClick={Edit}>
-            Edytuj
-          </Button>
+        <br />
+        <Button color="primary" style={{marginLeft:'unset', marginTop:'10px'}} onClick={Cancel}>
+          Cofnij
+        </Button>
+        <Button color="primary" style={{marginLeft:'4.7%', marginTop:'10px'}} onClick={Edit}>
+          Edytuj
+        </Button>
 
-          <Snackbar
-            open={this.state.open}
-            message="Edytowano uzytkownika"
-            autoHideDuration={2000}
-            onClose={this.handleRequestClose}
-          />
+        <Snackbar
+          open={this.state.open}
+          message="Edytowano uzytkownika"
+          autoHideDuration={2000}
+          onClose={this.handleRequestClose}
+        />
 
-          <Snackbar
-            open={this.state.openError}
-            message="Bląd podczas edycji"
-            autoHideDuration={2000}
-            onClose={this.handleRequestClose}
-          />
+        <Snackbar
+          open={this.state.openError}
+          message="Bląd podczas edycji"
+          autoHideDuration={2000}
+          onClose={this.handleRequestClose}
+        />
+
       </div>
     )
   }

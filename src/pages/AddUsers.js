@@ -24,20 +24,15 @@ const styles = {
   },
   div: {
     margin: 'auto',
-    width: '15%',
-    padding: '10px'
+    width: '11%',
+    padding: '10px',
+    marginTop:'-6%'
   },
   customWidth: {
     margin: 'auto',
     width: '100%'
   }
 };
-
-const tags = [
-  {name:'material-ui', _id:'1'},
-  {name:'material-design', _id:'2'},
-  {name:'material', _id:'3'}
-];
 
 class AddUser extends React.Component {
   constructor(props) {
@@ -51,12 +46,6 @@ class AddUser extends React.Component {
         values: [],
         tag: new Set()
       };
-  }
-
-  componentDidMount() {
-    fetch('https://reactmanagebe.herokuapp.com/api/projects')
-      .then( response => response.json())
-      .then( data => this.setState({values: data}))
   }
 
   handleRequestClose = () => {
@@ -80,7 +69,13 @@ class AddUser extends React.Component {
   render() {
 
     const { redirect } = this.state
+    const { redirectLogin } = this.state
 
+    if (redirectLogin) {
+      return (
+        <Redirect to={{pathname: '/login' }}/>
+      )
+    }
     if (redirect) {
       return (
         <Redirect to={{pathname: '/app/users' }}/>
@@ -100,13 +95,50 @@ class AddUser extends React.Component {
       });
     }
 
+    let changeSnackBarName = () => {
+      this.setState({
+        openName: true,
+      });
+    }
+
+    let changeSnackBarSurname = () => {
+      this.setState({
+        openSurname: true,
+      });
+    }
+
+    let changeSnackBarPassword = () => {
+      this.setState({
+        openPassword: true,
+      });
+    }
+
+
+    let changeSnackBarEmail = () => {
+      this.setState({
+        openEmail: true,
+      });
+    }
+
     let object = {
       name: this.state.name,
       surname: this.state.surname,
       email: this.state.email,
+      password: this.state.password
     }
 
     let doSomething = () => {
+
+      function validEmail(e) {
+        let filter = /^\s*[\w\-\+_]+(\.[\w\-\+_]+)*\@[\w\-\+_]+\.[\w\-\+_]+(\.[\w\-\+_]+)*\s*$/;
+        return String(e).search (filter) != -1;
+      }
+
+      if (!object.name) return changeSnackBarName()
+      if (!object.surname) return changeSnackBarSurname()
+      if (!object.password) return changeSnackBarPassword()
+      if (!object.email || validEmail(object.email) == false ) return changeSnackBarEmail()
+      
       let array = Array.from(this.state.tag);
       object.projects = array
       fetch('https://reactmanagebe.herokuapp.com/api/users',
@@ -115,6 +147,7 @@ class AddUser extends React.Component {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
           },
+          credentials: 'include',
           method: "POST",
           body: JSON.stringify(object)
         }
@@ -133,25 +166,42 @@ class AddUser extends React.Component {
           id="name"
           label="Imie"
           placeholder="Np. Jan"
+          required='true'
           margin="normal"
+          autoComplete="off"
           onChange={this.handleChange('name')}
         />
         <TextField
           id="surname"
           label="Nazwisko"
           placeholder="Np. Kowalski"
+          required='true'
           margin="normal"
+          autoComplete="off"
           onChange={this.handleChange('surname')}
         />
         <TextField
           id="email"
           label="Email"
+          required='true'
           placeholder="Np. kowalski@gmail.com"
           margin="normal"
+          autoComplete="off"
           onChange={this.handleChange('email')}
         />
 
-        <Button raised color="primary" style={{marginLeft:'4.7%', marginTop:'10px'}} onClick={doSomething}>
+        <TextField
+          id="password"
+          type="password"
+          label="Password"
+          placeholder="Np. qwe123 :)"
+          required='true'
+          margin="normal"
+          autoComplete="off"
+          onChange={this.handleChange('password')}
+        />
+
+        <Button color="primary" style={{paddingLeft:'8px', marginTop:'10px'}} onClick={doSomething}>
             Dodaj uzytkownika
           </Button>
       
@@ -164,9 +214,33 @@ class AddUser extends React.Component {
 
           <Snackbar
             open={this.state.openError}
-            message="Błąd podczas dodawania"
+            message="Błąd serwera"
             autoHideDuration={2000}
             onClose={this.handleRequestClose}
+          />
+
+          <Snackbar
+            open={this.state.openName}
+            message="Nie wpisano imienia"
+            autoHideDuration={1000}
+          />
+          
+          <Snackbar
+            open={this.state.openPassword}
+            message="Nie wpisano imienia"
+            autoHideDuration={1000}
+          />
+
+          <Snackbar
+            open={this.state.openSurname}
+            message="Nie wpisano nazwiska"
+            autoHideDuration={1000}
+          />
+
+          <Snackbar
+            open={this.state.openEmail}
+            message="Niepoprawny email"
+            autoHideDuration={1000}
           />
       </div>
     );

@@ -1,23 +1,15 @@
 import React, {Component} from 'react';
-import classNames from 'classnames';
-import AppBar from 'material-ui/AppBar';
-import Drawer from 'material-ui/Drawer';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
-import Toolbar from 'material-ui/Toolbar';
-import Typography from 'material-ui/Typography';
-import IconButton from 'material-ui/IconButton';
-import MenuIcon from 'material-ui-icons/Menu'; 
 import injectTapEventPlugin from 'react-tap-event-plugin';
-import { ListItem, ListItemText } from 'material-ui/List';
 import {
   BrowserRouter as Router,
   Route
-} from 'react-router-dom';  
+} from 'react-router-dom';
 
-
-
+import Default from './pages/Default';
 import GetProjects from './pages/getProjects';
+import GetProjectInfo from './pages/getProjectInfo';
 import AddProjects from './pages/AddProjects';
 import EditProjects from './pages/EditProjects';
 import GetUsers from './pages/getUsers';
@@ -25,20 +17,21 @@ import GetUserInfo from './pages/getUserInfo';
 import AddUsers from './pages/AddUsers';
 import EditUsers from './pages/EditUsers';
 import Home from './pages/Home';
+import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
 import GetSalaries from './pages/getSalaries';
 import AddSalaries from './pages/AddSalaries';
 import EditSalaries from './pages/EditSalaries';
-import Button from 'material-ui/Button';
-
-const drawerWidth = 240;
+import LokomotywaTomek from './pages/LokomotywaTomek';
+import GetProjectSalaries from './pages/getProjectSalaries';
+import GetOldProjects from './pages/getOldProjects';
 
 const styles = theme => ({
   root: {
-    marginLeft: '11%',
+    marginLeft: '8%',
     flexGrow: 1,
     zIndex: 1,
     overflow: 'hidden',
-    // position: 'relative',
     display: 'flex',
   },
   appFrame: {
@@ -54,6 +47,11 @@ const styles = theme => ({
     color: 'white',
     size: 'large',
     margin: theme.spacing.unit,
+  },
+  buttonLogout: {
+    color: 'white',
+    size: 'large',
+    marginLeft: '86%',
   },
   drawer: {
     position: 'relative',
@@ -87,53 +85,39 @@ class App extends Component {
       this.setState({ mobileOpen: !this.state.mobileOpen });
     };
   
+    handleDrawerToggle = () => {
+      this.setState({ mobileOpen: !this.state.mobileOpen });
+    };
+  
     render() {
-      const { classes, theme } = this.props;
-
+      const { classes } = this.props;
+      
       return (
         <div>
-          <div className={classes.root}>
-            <AppBar position="absolute" className={classes.appBar}>
-              <Toolbar>
-                <Typography type="title" color="inherit" noWrap>
-                 <Button className={classes.button} href='/'> Surprise.Design </Button>
-                </Typography>
-              </Toolbar>
-            </AppBar>
-            
-            <Drawer variant="permanent" className={classes.drawer}>
-            <div className={classes.toolbar} />
-              <ListItem button component="a" href="/users">
-                <ListItemText primary="Uzytkownicy" />
-              </ListItem>
 
-              <ListItem button component="a" href="/projects">
-                <ListItemText primary="Projekty" />
-              </ListItem>
-              
-              <ListItem button component="a" href="/salaries">
-                <ListItemText primary="Wypłaty" />
-              </ListItem>  
-            </Drawer>
+          <Router>
+            <div style={{marginTop:'90px', width:'100%', marginLeft:'0.9%', marginRight:'0.9%'}}>
+              <Route exact path="/login" component={Login} />
+              <Route exact path="/" component={Default}/>
+              <Route path="/app" component={Home} />
+              <Route path="/app/dashboard" component={Dashboard} />
+              <Route path="/app/lokomotywaTomek" component={LokomotywaTomek} />
+              <Route exact path="/app/projects" component={GetProjects} />
+              <Route exact path="/app/projects/old" component={GetOldProjects} />
+              <Route exact path="/app/projectInfo/:id" component={GetProjectInfo} />
+              <Route exact path="/app/projectInfo/salaries/:id" component={GetProjectSalaries} />
+              <Route path="/app/addProjects" component={AddProjects} />
+              <Route path="/app/editProjects/:id" component={EditProjects} />
+              <Route exact path="/app/users" component={GetUsers} />
+              <Route path="/app/userInfo/:id" component={GetUserInfo} />
+              <Route path="/app/addUsers" component={AddUsers} />
+              <Route path="/app/editUsers/:id" component={EditUsers} />
+              <Route path="/app/salaries" component={GetSalaries} />
+              <Route path="/app/addSalaries" component={AddSalaries} />
+              <Route path="/app/editSalaries/:id" component={EditSalaries} />
+            </div>
+          </Router>
 
-            <Router>
-              <div style={{marginTop:'90px', width:'100%', marginLeft:'0.9%', marginRight:'0.9%'}}>
-                <Route exact path="/" component={Home} />
-                <Route path="/projects" component={GetProjects} />
-                <Route path="/addProjects" component={AddProjects} />
-                <Route path="/editProjects/:id" component={EditProjects} />
-                <Route path="/users" component={GetUsers} />
-                <Route path="/userInfo/:id" component={GetUserInfo} />
-                <Route path="/addUsers" component={AddUsers} />
-                <Route path="/editUsers/:id" component={EditUsers} />
-                <Route path="/salaries" component={GetSalaries} />
-                <Route path="/addSalaries" component={AddSalaries} />
-                <Route path="/editSalaries/:id" component={EditSalaries} />
-              </div>
-            </Router>
-
-          </div>
-            
         </div>
       );
     }

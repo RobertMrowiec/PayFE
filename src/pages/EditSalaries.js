@@ -3,15 +3,22 @@ import { MenuItem } from 'material-ui/Menu';
 import { FormControl } from 'material-ui/Form';
 import Select from 'material-ui/Select';
 import TextField from 'material-ui/TextField'
-import { InputLabel } from 'material-ui/Input';
+import { Input, InputLabel } from 'material-ui/Input';
 import Snackbar from 'material-ui/Snackbar';
 import Button from 'material-ui/Button';
 import { Redirect } from 'react-router-dom';
 import { ListItemText } from 'material-ui/List';
+import { FormGroup, FormControlLabel } from 'material-ui/Form';
+import Checkbox from 'material-ui/Checkbox';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import { CircularProgress } from 'material-ui/Progress';
 
 const style = {
   div: {
     margin: 'auto',
+    marginLeft: '44.5%',
+    marginTop:'-6%',
     width: '15%',
     padding: '10px'
   },
@@ -40,16 +47,41 @@ class EditSalaries extends React.Component {
   }
 
   componentDidMount() {
-    fetch('https://reactmanagebe.herokuapp.com/api/salaries/' + this.props.match.params.id)
+    fetch('https://reactmanagebe.herokuapp.com/api/salaries/' + this.props.match.params.id, {credentials: 'include'})
       .then( response => response.json())
-      .then( data => this.setState({
-        title: data.title,
-        amount: data.amount,
-        userId: data.userId._id,
-        projectId: data.projectId._id,
-        projectName: data.projectId.name,
-        userName: data.userId.name
-      }))
+      .then( data => {
+        if (data.projectId) this.setState({
+          projectId: data.projectId._id,
+          projectName: data.projectId.name
+        })
+        
+        this.setState({
+          title: data.title,
+          amount: data.amount,
+          userId: data.userId._id,
+          userName: data.userId.name,
+          potentially: data.potentially,
+          description: data.description
+        })
+        
+      }).then(() => {
+        fetch('https://reactmanagebe.herokuapp.com/api/projects', {credentials: 'include'})
+        .then( response => response.json())
+        .then( data => {
+          this.setState({
+            projects: data.projects.sort((a,b) => a.name > b.name)
+          })
+        })
+      }).then(() => {
+        fetch('https://reactmanagebe.herokuapp.com/api/users/projects/' + this.state.projectId, {
+          credentials: 'include'
+      }).then(response => response.json())
+        .then(data => {
+          this.setState({users: data.sort((a,b) => a.name > b.name)})
+        })
+      }).catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
+      })
   }
 
   
@@ -66,10 +98,78 @@ class EditSalaries extends React.Component {
     });
   };
 
+  handleChangeCheckbox = name => event => {
+    this.setState({ [name]: event.target.checked });
+  };
+
+  changeDescription = value => {
+    this.setState({ description: value })
+  }
+
+  handleChangeProject = name => event => {
+    this.setState({[name]: event.target.value})
+    return fetch('https://reactmanagebe.herokuapp.com/api/users/projects/' + event.target.value, {
+      credentials: 'include'
+      }).then(response => response.json())
+        .then(data => {
+          this.setState({users: data.sort((a,b) => a.name > b.name)})
+        })
+  };
+
+  potentiallyFunction = value => {    
+    if(value == true){
+      return (
+        <div>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked="true"
+                onChange={this.handleChangeCheckbox('potentially')}
+                value="potentially"
+                color="primary"
+              />
+            }
+            label="Potencjalna"
+          />
+        </div>
+      )
+    }
+    else if (value == false) {
+      return (
+        <div>
+          <FormControlLabel
+            control={
+              <Checkbox
+                onChange={this.handleChangeCheckbox('potentially')}
+                value="potentially"
+                color="primary"
+              />
+            }
+            label="Potencjalna"
+          />
+        </div>
+      )
+    }
+  }
 
   render(){
     const { redirect } = this.state
-    console.log(this.state)
+    const { redirectLogin } = this.state
+    const { isLoading } = this.state
+
+    if (isLoading) {
+      return <CircularProgress style={{
+        'width': '75px',
+        'margin-left': '47%',
+        'margin-top': '10%'
+      }}/>
+    }
+
+    if (redirectLogin) {
+      return (
+        <Redirect to={{pathname: '/login' }}/>
+      )
+    }
     if (redirect) {
       return (
         <Redirect to={{pathname: '/app/salaries' }}/>
@@ -92,11 +192,14 @@ class EditSalaries extends React.Component {
     let object = {
       title: this.state.title,
       amount: this.state.amount,
-      projectId: this.state.projectId._id,
-      userId: this.state.userId._id,
+      projectId: this.state.projectId,
+      userId: this.state.userId,
+      potentially: this.state.potentially,
+      description: this.state.description || ''
     }
     
     let Edit = () => {
+      this.setState({isLoading: true})
       fetch('https://reactmanagebe.herokuapp.com/api/salaries/' + this.props.match.params.id,
         {
           headers: {
@@ -104,6 +207,7 @@ class EditSalaries extends React.Component {
             'Content-Type': 'application/json'
           },
           method: "PUT",
+          credentials: 'include',
           body: JSON.stringify(object)
         }
       ).then(response => {
@@ -111,14 +215,14 @@ class EditSalaries extends React.Component {
           throw Error(response.statusText)
         }
         return response
-      }).then(changeSnackBar)
+      }).then(() => this.setState({isLoading: false}))
+        .then(changeSnackBar)
         .catch(changeSnackBarToError)
     }
     
     let Cancel = () => {
-     {this.setState({redirect: true})}
+      {this.setState({redirect: true})}
     }
-
     return (
       
       <div style={style.div}>
@@ -142,31 +246,28 @@ class EditSalaries extends React.Component {
           onChange={this.handleChange('amount')}
         />
 
-
         <FormControl  style={{minWidth:166, maxWidth: 166}}>
-          <InputLabel htmlFor="projects-simple">Projects</InputLabel>
+          <InputLabel htmlFor="projects-simple"> Projekt </InputLabel>
           <Select
-            value={this.state.projectName}
-            onChange={this.handleChange('projectId')}
+            value={this.state.projectId}
+            onChange={this.handleChangeProject('projectId')}
             inputProps={{
               name: 'projects',
               id: 'projects-simple',
             }}
           >
             {this.state.projects.map(proj => (
-              <MenuItem key = {proj.id} value = {proj._id}>
+              <MenuItem key = {proj._id} value = {proj._id}>
                 <ListItemText primary = {proj.name} />
               </MenuItem>
             ))}
           </Select>
         </FormControl>
 
-
-
         <FormControl  style={{minWidth:166, maxWidth: 166}}>
-          <InputLabel htmlFor="users-simple">Users</InputLabel>
+          <InputLabel htmlFor="users-simple"> Odbiorca </InputLabel>
           <Select
-            value={this.state.userName}
+            value={this.state.userId}
             onChange={this.handleChange('userId')}
             inputProps={{
               name: 'users',
@@ -174,15 +275,29 @@ class EditSalaries extends React.Component {
             }}
           >
             {this.state.users.map(user => (
-              <MenuItem key = {user.id} value = {user._id}>
-                <ListItemText primary = {user.name} />
+              <MenuItem key = {user._id} value = {user._id}>
+                <ListItemText primary = {user.name + ' ' + user.surname} />
               </MenuItem>
             ))}
           </Select>
         </FormControl>
 
-        <Button raised color="primary" style={{marginLeft:'4.7%', marginTop:'10px'}} onClick={Edit}>
-            Edytuj wypłatę
+        {this.potentiallyFunction(this.state.potentially)}
+
+        <div style={{marginLeft:'-220px', minWidth:'620px', maxWidth:'620px'}}>
+          <ReactQuill 
+            value={this.state.description || ''}
+            onChange={this.changeDescription}
+          />
+        </div>
+
+        <br/>
+
+          <Button color="primary" style={{marginLeft:'unset', marginTop:'10px'}} onClick={Cancel}>
+            Cofnij
+          </Button>
+          <Button color="primary" style={{marginLeft:'4.7%', marginTop:'10px'}} onClick={Edit}>
+            Edytuj
           </Button>
 
           <Snackbar

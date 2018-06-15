@@ -13,6 +13,7 @@ import Dialog, {
 } from 'material-ui/Dialog';
 import { Link } from 'react-router-dom';  
 import Typography from 'material-ui/Typography';
+import { CircularProgress } from 'material-ui/Progress';
 
 const styles = theme => ({
   root: {
@@ -38,15 +39,17 @@ class GetUsers extends Component {
     this.state = {
       users: [],
       openDialog: false,
+      selectedUser: '',
       userId: ''
     }
   }
 
   deleteFunction (user, e) {
-    fetch('https://reactmanagebe.herokuapp.com/api/users/' + user._id,{
-      method: 'delete'
+    fetch('https://reactmanagebe.herokuapp.com/api/users/' + user,{
+      method: 'delete',
+      credentials: 'include'
     }).then(() => {
-      this.setState({users: this.state.users.filter(f => f._id !== user._id)});
+      this.setState({users: this.state.users.filter(f => f._id !== user)});
       this.setState({openDialog: false})
     })
   }
@@ -57,11 +60,26 @@ class GetUsers extends Component {
   }
 
   componentDidMount() {
-    fetch('https://reactmanagebe.herokuapp.com/api/users')
+    fetch('https://reactmanagebe.herokuapp.com/api/users', {credentials: 'include'})
       .then( response => response.json())
-      .then( data => this.setState({users: data}))
+      .then( data => {
+        this.setState({logged: data.logged})
+        this.setState({users: data.users})
+        if (data.logged.isAdmin == true) {
+          this.setState({isAdmin: true})
+        }
+        else {
+          this.setState({isAdmin: false})
+          
+        }
+      })
+      .then(() => this.setState({isLoading: false}))
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
+      })
   }
-  handleOpen = () => {
+  handleOpen = (user) => {
+    this.setState({ selectedUser: user})
     this.setState({ openDialog: true });
   };
 
@@ -69,11 +87,51 @@ class GetUsers extends Component {
     this.setState({ openDialog: false });
   };
 
+  disableButtonFunction() {
+    console.log(this.state.isAdmin);
+    
+    if (this.state.isAdmin == false || !this.state.isAdmin){
+      return(
+        <div style = {{marginLeft: '94%', marginBottom: '0.5%'}}>
+          <Button size='small' color="primary" aria-label="add" className={styles.button} disabled="true" component={Link} to="/app/addUsers">
+            <AddIcon />
+          </Button>
+        </div>
+      )
+    }
+    else {
+      return(
+        <div style = {{marginLeft: '94%', marginBottom: '0.5%'}}>
+          <Button size='small' color="primary" aria-label="add" className={styles.button} component={Link} to="/app/addUsers">
+            <AddIcon />
+          </Button>
+        </div>
+      )
+    }      
+  }
+
   render () {
     
     const { users } = this.state;
     const { redirect } = this.state
-
+    const { redirectLogin } = this.state
+    const { isLoading } = this.state
+    const { logged } = this.state
+    
+    if (isLoading) {
+      return <CircularProgress style={{
+        'width': '60px',
+        'height': '40px',
+        'margin-left': '44%',
+        'margin-top': '24%'
+      }}/>
+    }
+    if (redirectLogin) {
+      return (
+        <Redirect to={{pathname: '/login' }}/>
+      )
+    }
+    
     if (redirect) {
       return (
         <Redirect to={{pathname: '/app/userInfo/' + `${this.state.userId}` }}/>
@@ -81,16 +139,13 @@ class GetUsers extends Component {
     }
 
     return (
-      <div>
-        <div style={{marginLeft: '-5%', marginBottom: '-2%'}}>
+      <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '40px'}}>
+      <div style={{marginLeft: '-5%', marginBottom: '-2%'}}>
           <Typography variant = 'headline' align='center'> Programiści: </Typography>
         </div>
+        
+        {this.disableButtonFunction()}
 
-        <div style = {{marginLeft: '94%', marginBottom: '0.5%'}}>
-          <Button fab mini color="primary" aria-label="add" className={styles.button} component={Link} to="/addUsers">
-            <AddIcon />
-          </Button>
-        </div>
       <Paper className={styles.root}>
         <Table className={styles.table}>
           <TableHead>
@@ -106,49 +161,102 @@ class GetUsers extends Component {
           </TableHead>
           <TableBody>
             {users.map((user, i) => {
-              return (
-                <TableRow key={i}>
-                  <TableCell>{i + 1}</TableCell>
-                  <TableCell onClick={ () => this.redirectFunction(user)} >{user.name}</TableCell> 
-                  <TableCell onClick={ () => this.redirectFunction(user)} >{user.surname}</TableCell>
-                  <TableCell onClick={ () => this.redirectFunction(user)} >{user.email}</TableCell>
-                  <TableCell onClick={ () => this.redirectFunction(user)} >{user.projects.length}</TableCell>
-                  <TableCell>
+              if (logged.isAdmin == true) {
+                return (
+                  <TableRow key={i}>
+                    <TableCell>{i + 1}</TableCell>
+                    <TableCell onClick={ () => this.redirectFunction(user)} >{user.name}</TableCell> 
+                    <TableCell onClick={ () => this.redirectFunction(user)} >{user.surname}</TableCell>
+                    <TableCell onClick={ () => this.redirectFunction(user)} >{user.email}</TableCell>
+                    <TableCell onClick={ () => this.redirectFunction(user)} >{user.projects.length}</TableCell>
+                    <TableCell>
+  
+                      {/* edycja */}
+                      <Button size='small' color="primary" aria-label="add" style={{width:'35px', height:'23px'}} href={'/app/editUsers/' +`${user._id}`} >
+                        <ModeEditIcon />
+                      </Button>
+  
+                    </TableCell>
+                    <TableCell>
+  
+                      {/* usuwanie  */}
+                      <Button size='small' color="secondary" aria-label="add" style={{width:'35px', height:'23px'}} onClick={() => this.handleOpen(user._id)}>
+                        <DeleteIcon />
+                      </Button>
+  
+                    </TableCell>
+                  </TableRow>
+                )
+              }
+              else if (logged._id.toString() == user._id.toString()){
+                return (
+                  <TableRow key={i}>
+                    <TableCell>{i + 1}</TableCell>
+                    <TableCell>{user.name}</TableCell> 
+                    <TableCell>{user.surname}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.projects.length}</TableCell>
+                    <TableCell>
+  
+                      {/* edycja */}
+                      <Button size='small' color="primary" aria-label="add" style={{width:'35px', height:'23px'}} href={'/app/editUsers/' +`${user._id}`} >
+                        <ModeEditIcon />
+                      </Button>
+  
+                    </TableCell>
+                    <TableCell>
+  
+                      {/* usuwanie  */}
+                      <Button size='small' color="secondary" aria-label="add" disabled="true" style={{width:'35px', height:'23px'}}>
+                        <DeleteIcon />
+                      </Button>
+  
+                    </TableCell>
+                  </TableRow>
+                )
+              }
+              else {
+                return (
+                  <TableRow key={i}>
+                    <TableCell>{i + 1}</TableCell>
+                    <TableCell>{user.name}</TableCell> 
+                    <TableCell>{user.surname}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.projects.length}</TableCell>
+                    <TableCell>
 
-                    {/* edycja */}
-                    <Button fab mini color="primary" aria-label="add" style={{width:'35px', height:'23px'}} href={'/editUsers/' +`${user._id}`} >
-                      <ModeEditIcon style = {{width:'60%', height:'60%'}}/>
-                    </Button>
+                      {/* edycja */}
+                      <Button size='small' color="primary" aria-label="add" style={{width:'35px', height:'23px'}} href={'/app/editUsers/' +`${user._id}`} disabled="true">
+                        <ModeEditIcon />
+                      </Button>
 
-                  </TableCell>
-                  <TableCell>
+                    </TableCell>
+                    <TableCell>
 
-                    {/* usuwanie  */}
-                    <Button fab mini color="accent" aria-label="add" style={{width:'35px', height:'23px'}} onClick={() => {this.deleteFunction(user)}} >
-                      <DeleteIcon style = {{width:'60%', height:'60%'}}/>
-                    </Button>
+                      {/* usuwanie  */}
+                      <Button size='small' color="secondary" aria-label="add" style={{width:'35px', height:'23px'}} onClick={() => this.handleOpen(user._id)} disabled="true">
+                        <DeleteIcon />
+                      </Button>
 
-                  </TableCell>
-
-                  <Dialog
-                    open={this.state.openDialog}
-                    onClose={this.handleClose}
-                  >
-                  <DialogTitle>{"Czy na pewno chcesz usunąć tego uzytkownika?"}</DialogTitle>
-                  <DialogActions>
-                    <Button onClick={this.handleClose} color="primary">
-                      Anuluj
-                    </Button>
-                    <Button onClick={(e) => console.log(user)} color="accent" autoFocus>
-                      Usuń
-                    </Button>
-                  </DialogActions>
-                </Dialog>
-
-
-                </TableRow>
-              );
+                    </TableCell>
+                  </TableRow>
+                );
+              }
             })}
+            <Dialog
+              open={this.state.openDialog}
+              onClose={this.handleClose}
+            >
+              <DialogTitle>{"Czy na pewno chcesz usunąć tego uzytkownika?"}</DialogTitle>
+              <DialogActions>
+                <Button onClick={this.handleClose} color="primary">
+                  Anuluj
+                </Button>
+                <Button onClick={() => this.deleteFunction(this.state.selectedUser)} color="secondary" autoFocus>
+                  Usuń
+                </Button>
+              </DialogActions>
+            </Dialog>
           </TableBody>
         </Table>
       </Paper>

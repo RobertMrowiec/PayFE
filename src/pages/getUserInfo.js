@@ -1,33 +1,17 @@
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 import Paper from 'material-ui/Paper';
 import Button from 'material-ui/Button';
-import AddIcon from 'material-ui-icons/Add';
-import ModeEditIcon from 'material-ui-icons/ModeEdit';
-import DeleteIcon from 'material-ui-icons/Delete';
-import { Redirect } from 'react-router-dom';
 import Typography from 'material-ui/Typography';
 import Card, { CardActions, CardContent } from 'material-ui/Card';
-import Avatar from 'material-ui/Avatar';
 import Chip from 'material-ui/Chip';
-import TagFacesIcon from 'material-ui-icons/TagFaces';
 import { MenuItem } from 'material-ui/Menu';
-import { FormControl, FormHelperText } from "material-ui/Form";
-import Input, { InputLabel } from "material-ui/Input";
+import { FormControl } from "material-ui/Form";
+import { InputLabel } from "material-ui/Input";
 import Select from 'material-ui/Select';
-import Dialog, {
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-} from 'material-ui/Dialog';
-import {
-  BrowserRouter as Router,
-  Route,
-  Link
-} from 'react-router-dom';  
+import { Redirect } from 'react-router-dom';
+import { CircularProgress } from 'material-ui/Progress';
 
 const styles = theme => ({
   root: {
@@ -38,9 +22,10 @@ const styles = theme => ({
   rootChip: {
     display: 'flex',
     alignItems: 'flex-start',
-    // flexWrap: 'wrap',
     padding: theme.spacing.unit / 2,
-    marginLeft: '51%'
+    marginLeft: '51%',
+    marginTop: '-120px',
+    marginBottom: '125px'
   },
 
   table: {
@@ -88,7 +73,7 @@ class GetUserInfo extends Component {
   }
 
   componentDidMount() {
-    fetch('https://reactmanagebe.herokuapp.com/api/users/' + this.props.match.params.id)
+    fetch('https://reactmanagebe.herokuapp.com/api/users/' + this.props.match.params.id, {credentials: 'include'})
       .then( response => response.json())
       .then( data => this.setState({
         name: data.name,
@@ -99,25 +84,29 @@ class GetUserInfo extends Component {
       }),
       )
       .then(() => {
-        fetch('https://reactmanagebe.herokuapp.com/api/salaries/user/' + this.props.match.params.id)
+        fetch('https://reactmanagebe.herokuapp.com/api/salaries/user/' + this.props.match.params.id, {credentials: 'include'})
         .then( response => response.json())
         .then( salaryData => this.setState({salaries: salaryData}))
+      })
+      .then(() => this.setState({isLoading: false}))
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
       })
   }
 
   changeSalary = event => {
     this.setState({ age: event.target.value});
-    fetch('https://reactmanagebe.herokuapp.com/api/salaries/user/' + this.props.match.params.id + '/date/' + event.target.value)
+    fetch('https://reactmanagebe.herokuapp.com/api/salaries/user/' + this.props.match.params.id + '/date/' + event.target.value, {credentials: 'include'})
     .then( response => response.json())
     .then( salaryData => this.setState({salaries: salaryData}))
   };
 
   handleDelete = data => () => {
     fetch('https://reactmanagebe.herokuapp.com/api/users/' + this.props.match.params.id + '/projects/' + data._id,{
-      method: 'delete'
+      method: 'delete',
+      credentials: 'include'
     }).then(() => {
       this.setState({chipData: this.state.chipData.filter(f => f._id !== data._id)});
-      // this.setState({openDialog: false})
     })
   };
 
@@ -125,24 +114,36 @@ class GetUserInfo extends Component {
   render () {
     const { classes } = this.props;
     const { salaries } = this.state;
-    const bull = <span className={classes.bullet}>•</span>;
+    const { redirectLogin } = this.state
+    const { isLoading } = this.state
 
+    if (isLoading) {
+      return <CircularProgress style={{
+        'width': '60px',
+        'height': '40px',
+        'margin-left': '44%',
+        'margin-top': '24%'
+      }}/>
+    }
+
+    if (redirectLogin) {
+      return (
+        <Redirect to={{pathname: '/login' }}/>
+      )
+    }
     return (
-      <div>
+      <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '40px'}}>
           <Card style = {{width: '50%'}}>
             <CardContent>
               <Typography>Dane uzytkownika:</Typography>
               <Typography type="headline" component="h3">
-              {this.state.name} {this.state.surname}
+                {this.state.name} {this.state.surname}
               </Typography>
               <Typography >Adres email</Typography>
               <Typography>
                 {this.state.email}
               </Typography>
             </CardContent>
-            <CardActions>
-              <Button dense>Zrób coś</Button>
-            </CardActions>
           </Card>
 
           <Paper className={classes.rootChip}>
@@ -188,14 +189,26 @@ class GetUserInfo extends Component {
               </TableHead>
               <TableBody>
                 {salaries.map((salary, i) => {
-                  return (
-                    <TableRow key={i}>
-                      <TableCell>{i + 1}</TableCell>
-                      <TableCell>{salary.amount.toFixed(2)} zł</TableCell> 
-                      <TableCell>{salary.projectId.name}</TableCell>
-                      <TableCell>{salary.date}</TableCell>
-                    </TableRow>
-                  );
+                  if (salary.projectId != null){
+                    return (
+                      <TableRow key={i}>
+                        <TableCell>{i + 1}</TableCell>
+                        <TableCell>{salary.amount.toFixed(2)} zł</TableCell> 
+                        <TableCell>{salary.projectId.name}</TableCell>
+                        <TableCell>{salary.date}</TableCell>
+                      </TableRow>
+                    );
+                  }
+                  else {
+                    return (
+                      <TableRow key={i}>
+                        <TableCell>{i + 1}</TableCell>
+                        <TableCell>{salary.amount.toFixed(2)} zł</TableCell> 
+                        <TableCell></TableCell>
+                        <TableCell>{salary.date}</TableCell>
+                      </TableRow>
+                    );
+                  }
                 })}
               </TableBody>
             </Table>
