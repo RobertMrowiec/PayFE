@@ -244,7 +244,8 @@ class AddProjects extends Component {
       domainLogin: this.state.domainLogin,
       domainPassword: this.state.domainPassword,
       clientNumber: this.state.clientNumber,
-      description: this.state.description || ''
+      description: this.state.description || '',
+      monthly: this.state.monthly
     }
     
     if (this.state.hosting){
@@ -339,17 +340,18 @@ class AddProjects extends Component {
                     onChange={this.handleChange('amount')}
                   />
 
-                  <TextField
-                    id="port"
-                    label="Port"
-                    type="number"
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    style={{padding:"5px"}}
-                    margin="normal"
-                    onChange={this.handleChange('port')}
-                  />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={this.state.monthly}
+                          onChange={this.handleChangeCheckbox('monthly')}
+                          value="monthly"
+                          color="primary"
+                        />
+                      }
+                      style={{marginTop: "-25px"}}
+                      label="Miesięcznie"
+                    />
                 </tr>
               </td>
             </table>
@@ -420,9 +422,20 @@ class AddProjects extends Component {
                     InputLabelProps={{
                       shrink: true
                     }}
-                    style={{marginLeft:'16%'}}
+                    style={{padding:"5px"}}
                     margin="normal"
                     onChange={this.handleChange('clientNumber')}
+                  />
+                  <TextField
+                    id="port"
+                    label="Port"
+                    type="number"
+                    InputLabelProps={{
+                      shrink: true
+                    }}
+                    style={{padding:"5px"}}
+                    margin="normal"
+                    onChange={this.handleChange('port')}
                   />
                 </tr>
 
@@ -450,7 +463,7 @@ class AddProjects extends Component {
                 color="primary"
               />
             }
-            label="Stary"
+            label="Stary projekt"
           />
 
           <br/>

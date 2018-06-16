@@ -11,6 +11,7 @@ import Checkbox from 'material-ui/Checkbox';
 import Select from 'material-ui/Select';
 import Typography from 'material-ui/Typography';
 import { FormGroup, FormControlLabel } from 'material-ui/Form';
+import { CircularProgress } from 'material-ui/Progress';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import 'typeface-roboto';
@@ -71,13 +72,15 @@ class EditProjects extends Component {
           domainDateStart: data.domainDateStart,
           domainDateNotify: data.domainDateNotify,
           clientNumber: data.clientNumber,
-          description: data.description || ''
+          description: data.description || '',
+          monthly: data.monthly || false
         })
-
+        this.setState({isLoading: true})
       }).then(() => {
         fetch('https://reactmanagebe.herokuapp.com/api/users', {credentials: 'include'})
         .then( response => response.json())
         .then( data => this.setState({values: data.users}))
+        .then(() => this.setState({isLoading: false}))
       })
       .catch(err => {
         if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
@@ -106,6 +109,25 @@ class EditProjects extends Component {
     this.setState({ tag: new Set(event.target.value) });
   };
 
+  handleChangeDate = (name, name2) => event => {
+    if (event.target.value.length == 10){
+      let nextYearDate = new Date(event.target.value);
+      nextYearDate.setDate(nextYearDate.getDate() + 352);
+      nextYearDate = nextYearDate.toISOString().slice(0,10)
+
+      this.setState({
+        [name]: event.target.value,
+        [name2]: nextYearDate
+      });
+    } else {
+      return 
+    }
+  };
+
+  changeDescription = value => {
+    this.setState({ description: value })
+  }
+
   showHosting() {
     if (this.state.hosting == true){
       return (
@@ -133,7 +155,7 @@ class EditProjects extends Component {
             placeholder={this.state.hostingDateStart}            
             style={{padding:"5px"}}
             margin="normal"
-            onChange={this.handleChange('hostingDateStart')}
+            onChange={this.handleChangeDate('hostingDateStart', 'hostingDateNotify')}
           />
   
           <TextField
@@ -143,7 +165,7 @@ class EditProjects extends Component {
             InputLabelProps={{
               shrink: true
             }}
-            placeholder={this.state.hostingDateNotify}            
+            value={this.state.hostingDateNotify}
             style={{padding:"5px"}}
             margin="normal"
             onChange={this.handleChange('hostingDateNotify')}
@@ -186,7 +208,7 @@ class EditProjects extends Component {
             placeholder={this.state.domainDateStart}            
             style={{padding:"5px"}}
             margin="normal"
-            onChange={this.handleChange('domainDateStart')}
+            onChange={this.handleChangeDate('domainDateStart', 'domainDateNotify')}
           />
 
           <TextField
@@ -196,7 +218,7 @@ class EditProjects extends Component {
             InputLabelProps={{
               shrink: true
             }}
-            placeholder={this.state.domainDateNotify}            
+            value={this.state.domainDateNotify}
             style={{padding:"5px"}}
             margin="normal"
             onChange={this.handleChange('domainDateNotify')}
@@ -212,10 +234,6 @@ class EditProjects extends Component {
     }
   }
 
-  changeDescription = value => {
-    this.setState({ description: value })
-  }
-
   oldFunction = value => {    
     if(value == true){
       return (
@@ -229,7 +247,7 @@ class EditProjects extends Component {
                 color="primary"
               />
             }
-            label="Stary"
+            label="Stary projekt"
           />
         </div>
       )
@@ -245,7 +263,7 @@ class EditProjects extends Component {
                 color="primary"
               />
             }
-            label="Stary"
+            label="Stary projekt"
           />
         </div>
       )
@@ -255,6 +273,15 @@ class EditProjects extends Component {
   render(){
     const { redirect } = this.state
     const { redirectLogin } = this.state
+    const { isLoading } = this.state
+
+    if (isLoading) {
+      return <CircularProgress style={{
+        'width': '75px',
+        'margin-left': '47%',
+        'margin-top': '10%'
+      }}/>
+    }
 
     if (redirectLogin) {
       return (
@@ -289,18 +316,25 @@ class EditProjects extends Component {
       hosting: this.state.hosting,
       hostingLogin: this.state.hostingLogin,
       hostingPassword: this.state.hostingPassword,
-      hostingPrice: this.state.hostingPrice,
-      hostingDateStart: this.state.hostingDateStart,
-      hostingDateNotify: this.state.hostingDateNotify,
       domain: this.state.domain,
       domainLogin: this.state.domainLogin,
       domainPassword: this.state.domainPassword,
-      domainPrice: this.state.domainPrice,
-      domainDateStart: this.state.domainDateStart,
-      domainDateNotify: this.state.domainDateNotify,
       clientNumber: this.state.clientNumber,
-      description: this.state.description || ''
+      description: this.state.description || '',
+      monthly: this.state.monthly
     }
+    if (this.state.hosting){
+      object.hostingPrice= this.state.hostingPrice
+      object.hostingDateStart= this.state.hostingDateStart
+      object.hostingDateNotify= this.state.hostingDateNotify
+    }
+    
+    if (this.state.domain){
+      object.domainPrice= this.state.domainPrice
+      object.domainDateStart= this.state.domainDateStart
+      object.domainDateNotify= this.state.domainDateNotify
+    }
+
     
     let Edit = () => {
       let array = Array.from(this.state.tag);
@@ -384,18 +418,17 @@ class EditProjects extends Component {
                       onChange={this.handleChange('amount')}
                     />
 
-                    <TextField
-                      id="port"
-                      label="Port"
-                      type="number"
-                      placeholder={this.state.port}
-                      InputLabelProps={{
-                        shrink: true
-                      }}
-                      style={{padding:"5px"}}
-                      margin="normal"
-                      onChange={this.handleChange('port')}
-                    />
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={this.state.monthly}
+                          onChange={this.handleChangeCheckbox('monthly')}
+                          value="monthly"
+                          color="primary"
+                        />
+                      }
+                      label="Miesięcznie"
+                    />                  
                   </tr>
                 </td>
               </table>
@@ -468,9 +501,21 @@ class EditProjects extends Component {
                         shrink: true
                       }}
                       placeholder={this.state.clientNumber}
-                      style={{marginLeft:'16%'}}
+                      style={{padding: '5px'}}
                       margin="normal"
                       onChange={this.handleChange('clientNumber')}
+                    />
+                    <TextField
+                      id="port"
+                      label="Port"
+                      type="number"
+                      placeholder={this.state.port}
+                      InputLabelProps={{
+                        shrink: true
+                      }}
+                      style={{padding:"5px"}}
+                      margin="normal"
+                      onChange={this.handleChange('port')}
                     />
                   </tr>
                   <tr>

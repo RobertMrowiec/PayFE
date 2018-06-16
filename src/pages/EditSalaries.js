@@ -13,6 +13,10 @@ import Checkbox from 'material-ui/Checkbox';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { CircularProgress } from 'material-ui/Progress';
+import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
+import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
+import DatePicker from 'material-ui-pickers/DatePicker';
+import plLocale from 'date-fns/locale/pl';
 
 const style = {
   div: {
@@ -61,7 +65,8 @@ class EditSalaries extends React.Component {
           userId: data.userId._id,
           userName: data.userId.name,
           potentially: data.potentially,
-          description: data.description
+          description: data.description,
+          selectedDate: data.selectedDate || Date.now()
         })
         
       }).then(() => {
@@ -102,6 +107,10 @@ class EditSalaries extends React.Component {
     this.setState({ [name]: event.target.checked });
   };
 
+  handleDateChange = (date) => {
+    this.setState({ selectedDate: date });
+  }
+
   changeDescription = value => {
     this.setState({ description: value })
   }
@@ -115,23 +124,33 @@ class EditSalaries extends React.Component {
           this.setState({users: data.sort((a,b) => a.name > b.name)})
         })
   };
-
+  
   potentiallyFunction = value => {    
     if(value == true){
       return (
         <div>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked="true"
-                onChange={this.handleChangeCheckbox('potentially')}
-                value="potentially"
-                color="primary"
+          <div>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked="true"
+                  onChange={this.handleChangeCheckbox('potentially')}
+                  value="potentially"
+                  color="primary"
+                />
+              }
+              label="Potencjalna"
+            />
+          </div>
+          <div style={{marginBottom: '10px'}}>
+            <MuiPickersUtilsProvider utils={DateFnsUtils} locale={plLocale}>
+              <DatePicker
+                value={this.state.selectedDate}
+                onChange={this.handleDateChange}
               />
-            }
-            label="Potencjalna"
-          />
-        </div>
+            </MuiPickersUtilsProvider>
+          </div>      
+        </div>      
       )
     }
     else if (value == false) {
@@ -195,7 +214,8 @@ class EditSalaries extends React.Component {
       projectId: this.state.projectId,
       userId: this.state.userId,
       potentially: this.state.potentially,
-      description: this.state.description || ''
+      description: this.state.description || '',
+      selectedDate: this.state.selectedDate
     }
     
     let Edit = () => {

@@ -14,6 +14,10 @@ import { FormGroup, FormControlLabel } from 'material-ui/Form';
 import Checkbox from 'material-ui/Checkbox';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
+import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
+import DatePicker from 'material-ui-pickers/DatePicker';
+import plLocale from 'date-fns/locale/pl';
 
 const styles = {
   container: {
@@ -87,6 +91,14 @@ class AddSalaries extends React.Component {
     this.setState({ [name]: event.target.checked });
   };
 
+  handleDateChange = (date) => {
+    this.setState({ selectedDate: date });
+  }
+
+  changeDescription = value => {
+    this.setState({ description: value })
+  }
+
   handleChangeProject = name => event => {
     this.setState({[name]: event.target.value})
     return fetch('https://reactmanagebe.herokuapp.com/api/users/projects/' + event.target.value, {
@@ -97,8 +109,23 @@ class AddSalaries extends React.Component {
         })
   };
 
-  changeDescription = value => {
-    this.setState({ description: value })
+  datePickerForm() {
+    if (this.state.potentially){
+      return (
+        <div style={{marginBottom: '10px'}}>
+          <MuiPickersUtilsProvider utils={DateFnsUtils} locale={plLocale}>
+            <DatePicker
+              value={this.state.selectedDate}
+              onChange={this.handleDateChange}
+            />
+          </MuiPickersUtilsProvider>
+        </div>
+      )
+    } else {
+      return (
+        <div></div>
+      )
+    }
   }
 
   disableUserForm() {
@@ -193,6 +220,7 @@ class AddSalaries extends React.Component {
     let object = {
       title: this.state.title,
       potentially: this.state.potentially || false,
+      selectedDate: this.state.selectedDate,
       amount: this.state.amount,
       userId: this.state.userId,
       projectId: this.state.projectId || null,
@@ -262,6 +290,8 @@ class AddSalaries extends React.Component {
         </FormControl>
         
         {this.disableUserForm()}
+        
+        <div></div>
 
         <FormControlLabel
           control={
@@ -274,6 +304,10 @@ class AddSalaries extends React.Component {
           }
           label="Potencjalna"
         />
+
+        <div></div>
+
+        {this.datePickerForm()}
 
         <div style={{marginLeft:'-220px', minWidth:'620px', maxWidth:'620px'}}>
           <ReactQuill 
