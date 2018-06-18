@@ -142,14 +142,14 @@ class EditSalaries extends React.Component {
               label="Potencjalna"
             />
           </div>
-          <div style={{marginBottom: '10px'}}>
+          {/* <div style={{marginBottom: '10px'}}>
             <MuiPickersUtilsProvider utils={DateFnsUtils} locale={plLocale}>
               <DatePicker
                 value={this.state.selectedDate}
                 onChange={this.handleDateChange}
               />
             </MuiPickersUtilsProvider>
-          </div>      
+          </div>       */}
         </div>      
       )
     }

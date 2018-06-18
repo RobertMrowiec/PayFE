@@ -8,6 +8,7 @@ import AddIcon from 'material-ui-icons/Add';
 import ModeEditIcon from 'material-ui-icons/ModeEdit';
 import Typography from 'material-ui/Typography';
 import DeleteIcon from 'material-ui-icons/Delete';
+import MoneyIcon from "material-ui-icons/AttachMoney";
 import { Redirect } from 'react-router-dom';
 import { CircularProgress } from 'material-ui/Progress';
 import Dialog, {
@@ -112,7 +113,7 @@ class GetProjects extends Component {
     
     if (projects.length > 0) {
       if (logged.isAdmin == true) return (
-        <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '40px'}}>
+        <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '20px'}}>
           <div style={{marginLeft: '-5%', marginBottom: '-2%'}}>
             <Typography variant = 'headline' align='center'> Projekty: </Typography>
           </div>
@@ -134,6 +135,7 @@ class GetProjects extends Component {
                 <TableCell>Ile pozostało potencjalnie</TableCell>
                 <TableCell>Ilość programistów</TableCell>
                 <TableCell>Ilość wypłat</TableCell>
+                <TableCell>Wypłaty</TableCell>
                 <TableCell>Edycja</TableCell>
                 <TableCell>Usuwanie</TableCell>
               </TableRow>
@@ -149,6 +151,14 @@ class GetProjects extends Component {
                     <TableCell onClick={ () => this.redirectFunction(project)}> {project.howmanyPotentially.toFixed(2)} zł </TableCell>
                     <TableCell onClick={ () => this.redirectFunction(project)}> {project.peoples} </TableCell>
                     <TableCell onClick={ () => this.redirectToSalaryFunction(project)}> {project.salaries} </TableCell>
+                    <TableCell>
+
+                      {/* edycja */}
+                      <Button size='small' color="primary" aria-label="edit" style={{width:'35px', height:'23px'}} href={'/app/projectInfo/salaries/' +`${project._id}`}>
+                        <MoneyIcon />
+                      </Button>
+
+                    </TableCell>
                     <TableCell>
 
                       {/* edycja */}
@@ -191,7 +201,7 @@ class GetProjects extends Component {
       )
       else {
         return (
-          <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '40px'}}>
+          <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '20px'}}>
             <div style={{marginLeft: '-5%', marginBottom: '-2%'}}>
               <Typography variant = 'headline' align='center'> Projekty: </Typography>
             </div>
@@ -226,16 +236,21 @@ class GetProjects extends Component {
                       <TableCell>{project.peoples}</TableCell>
                       <TableCell>{project.salaries}</TableCell>
                       <TableCell>
+
+                        <Button size='small' color="primary" aria-label="edit" style={{width:'35px', height:'23px'}} disabled="true" href={'/app/editProjects/' +`${project._id}`}>
+                          <MoneyIcon />
+                        </Button>
+
+                      </TableCell>
+                      <TableCell>
   
-                        {/* edycja */}
                         <Button size='small' color="primary" aria-label="edit" style={{width:'35px', height:'23px'}} disabled='true' href={'/app/editProjects/' +`${project._id}`}>
-                          <ModeEditIcon />
+                          <MoneyIcon />
                         </Button>
   
                       </TableCell>
                       <TableCell>
                         
-                        {/* usuwanie  */}
                         <Button size='small' color="secondary" aria-label="delete" style={{width:'35px', height:'23px'}} disabled='true' onClick={() => this.handleOpen(project._id)}>
                           <DeleteIcon />
                         </Button>
@@ -269,7 +284,7 @@ class GetProjects extends Component {
     }
     else {
       return (
-        <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '40px'}}>
+        <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '20px'}}>
           <div style={{marginLeft: '-5%', marginBottom: '-2%'}}>
             <Typography variant = 'headline' align='center'> Projekty: </Typography>
           </div>

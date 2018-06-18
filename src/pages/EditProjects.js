@@ -15,6 +15,7 @@ import { CircularProgress } from 'material-ui/Progress';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import 'typeface-roboto';
+console.log(React.version);
 
 const style = {
   div: {

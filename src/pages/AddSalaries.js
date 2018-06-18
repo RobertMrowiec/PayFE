@@ -8,15 +8,13 @@ import Snackbar from 'material-ui/Snackbar';
 import Button from 'material-ui/Button';
 import { Redirect } from 'react-router-dom';
 import { ListItemText } from 'material-ui/List';
-import { log } from 'util';
-import { Link } from 'react-router-dom';
 import { FormGroup, FormControlLabel } from 'material-ui/Form';
 import Checkbox from 'material-ui/Checkbox';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { DatePicker } from 'material-ui-pickers';
 import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
-import DatePicker from 'material-ui-pickers/DatePicker';
 import plLocale from 'date-fns/locale/pl';
 
 const styles = {
@@ -56,7 +54,7 @@ class AddSalaries extends React.Component {
       projectId: '',
       projects: [],
       users: [],
-      selectedDate: new Date()
+      selectedDate: Date.now()
     } 
   }
 
@@ -113,9 +111,9 @@ class AddSalaries extends React.Component {
     if (this.state.potentially){
       return (
         <div style={{marginBottom: '10px'}}>
-          <MuiPickersUtilsProvider utils={DateFnsUtils} locale={plLocale}>
+          <MuiPickersUtilsProvider utils={DateFnsUtils} >
             <DatePicker
-              value={this.state.selectedDate}
+              value={this.state.date}
               onChange={this.handleDateChange}
             />
           </MuiPickersUtilsProvider>
@@ -307,7 +305,7 @@ class AddSalaries extends React.Component {
 
         <div></div>
 
-        {this.datePickerForm()}
+        {/* {this.datePickerForm()} */}
 
         <div style={{marginLeft:'-220px', minWidth:'620px', maxWidth:'620px'}}>
           <ReactQuill 

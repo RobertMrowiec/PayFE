@@ -6,10 +6,10 @@ class Default extends React.Component {
 
   render() {
     return (
-      <div style = {{marginLeft:'200px', marginTop:'-85px'}}>
-        <Iframe url="https://lokomotywatomek.herokuapp.com/"
-          width='98%'
-          height='970px'
+      <div style = {{paddingLeft: '143px', marginTop: '-6.2%'}}>
+        <Iframe url="http://hosting.surprise.design/"
+          width='100%'
+          height='889px'
           id="myId"
           display="initial"
           position="relative"

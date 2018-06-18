@@ -139,7 +139,7 @@ class GetUsers extends Component {
     }
 
     return (
-      <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '40px'}}>
+      <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '20px'}}>
       <div style={{marginLeft: '-5%', marginBottom: '-2%'}}>
           <Typography variant = 'headline' align='center'> Programiści: </Typography>
         </div>

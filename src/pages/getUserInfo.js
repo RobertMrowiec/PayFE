@@ -132,7 +132,7 @@ class GetUserInfo extends Component {
       )
     }
     return (
-      <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '40px'}}>
+      <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '20px'}}>
           <Card style = {{width: '50%'}}>
             <CardContent>
               <Typography>Dane uzytkownika:</Typography>

@@ -121,7 +121,7 @@ class GetOldProjects extends Component {
     if (isAdmin == true){
       if (projects.length > 0) {
         return (
-          <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '40px'}}>
+          <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '20px'}}>
   
             <div style={{marginLeft: '-5%', marginBottom: '-2%'}}>
               <Typography variant = 'headline' align='center'> Stare projekty: </Typography>
@@ -200,7 +200,7 @@ class GetOldProjects extends Component {
         )
       } else {
         return (
-          <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '40px'}}>
+          <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '20px'}}>
   
             <div style={{marginLeft: '-5%', marginBottom: '-2%'}}>
               <Typography variant = 'headline' align='center'> Projekty: </Typography>

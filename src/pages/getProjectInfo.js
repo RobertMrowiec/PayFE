@@ -68,7 +68,7 @@ class GetProjectInfo extends Component {
     }
   
     return (
-      <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '40px'}}>
+      <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '20px'}}>
         <Line data={data} height={170} />
       </div>
     )

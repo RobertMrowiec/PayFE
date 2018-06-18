@@ -60,9 +60,15 @@ class GetProjectSalaries extends Component {
       }}/>
     }
     return (
-      <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '40px'}}>
+      <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '20px'}}>
         <div style={{marginLeft: '-5%', marginBottom: '-2%'}}>
           <Typography variant = 'headline' align='center'> Wypłaty: </Typography>
+        </div>
+
+        <div style = {{marginLeft: '94%', marginBottom: '0.5%'}}>
+          <Button fab mini color="primary" aria-label="add" className={styles.button} component={Link} to="/app/addProjects">
+            <AddIcon />
+          </Button>
         </div>
 
         <Paper className={styles.root}>

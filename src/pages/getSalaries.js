@@ -139,7 +139,7 @@ class GetSalaries extends Component {
     }
     if (this.state.isAdmin == true) {
       return (
-        <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '40px'}}>
+        <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '20px'}}>
           <div style={{marginLeft: '-5%', marginBottom: '-2%'}}>
             <Typography variant = 'headline' align='center'> Wypłaty: </Typography>
           </div>
@@ -235,7 +235,7 @@ class GetSalaries extends Component {
     }
     else {
       return (
-        <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '40px'}}>
+        <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '20px'}}>
           <div style={{marginLeft: '-5%', marginBottom: '-2%'}}>
             <Typography variant = 'headline' align='center'> Wypłaty: </Typography>
           </div>

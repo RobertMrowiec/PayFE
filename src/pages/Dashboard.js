@@ -139,7 +139,7 @@ class Home extends Component {
       }
 
       return (
-        <div style={{marginLeft: '8%', marginTop: '-5%', width:'90%'}}>
+        <div style={{paddingLeft: '150px', marginTop: '-5%', width:'90%'}}>
             <Line data={data} height={170}/>
         </div>
       )
