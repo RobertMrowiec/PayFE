@@ -99,6 +99,9 @@ class Home extends Component {
     const { sumData } = this.state
     const { classes } = this.props
 
+    let Cancel = () => this.setState({redirect: true})
+  
+    
     if (isLoading) {
       return <CircularProgress style={{
         'width': '60px',
@@ -118,7 +121,6 @@ class Home extends Component {
       return (
         <div style={{textAlign:'center', marginTop:'15%'}}>
           <Typography variant = 'display2' className={styles.typo}> W tym miesiącu zarobiłeś: {this.state.sum.toFixed(2)} zł
-            {/* <Typography> * Proponuje tutaj tez zrobic wykres tylko z podziałem na projekty (estimate time = 6 hours) </Typography> */}
           </Typography>
         </div>
       )
@@ -139,8 +141,8 @@ class Home extends Component {
       }
 
       return (
-        <div style={{paddingLeft: '150px', marginTop: '-5%', width:'90%'}}>
-            <Line data={data} height={170}/>
+        <div style={{paddingLeft: '150px', marginTop: '-6%', width:'90%'}}>
+            <Line data={data} height={150}/>
         </div>
       )
     }

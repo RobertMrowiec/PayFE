@@ -88,6 +88,7 @@ class AddProjects extends Component {
     this.setState({ description: value })
   }
 
+  
   showHosting() {
     if (this.state.hosting == true){
       return (
@@ -206,6 +207,8 @@ class AddProjects extends Component {
       )
     }
 
+    let Cancel = () => this.setState({redirect: true})
+
     let changeSnackBar = () => {
       this.setState({
         open: true,
@@ -291,241 +294,249 @@ class AddProjects extends Component {
     }
 
     return (
-      <div style={{marginLeft: '40%'}}>
-        <div style={{display: 'flex'}}>
-          <div style={{marginTop: '-8%'}}>
-            <table>
-              <td>
-                <tr>
-                  <TextField
-                    id="name"
-                    label="Nazwa projektu"
-                    placeholder="Np.BPC"
-                    margin="normal"
-                    style={{padding:"5px"}}
-                    required={true}
-                    onChange={this.handleChange('name')}
-                  />
-
-                  <FormControl style={{minWidth:166, maxWidth: 166, padding:"5px"}}>
-                  <InputLabel htmlFor="tag-multiple">Uzytkownicy</InputLabel>
-                  <Select
-                    multiple
-                    value={[...this.state.tag]}
-                    onChange={this.handleTagChange}
-                    input={<Input id="tag-multiple" />}
-                    renderValue={selected => `Wybranych: ${selected.length}`}
-                  >
-                    {this.state.values.map(tag => (
-                      <MenuItem key={tag.id} value={tag._id}>
-                        <Checkbox checked={this.state.tag.has(tag._id)} />
-                        <ListItemText primary={tag.name + ' ' + tag.surname} />
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  </FormControl>
-                </tr>
-
-                <tr>
-                  <TextField
-                    id="number"
-                    label="Kwota"
-                    type="number"
-                    required="true"
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    style={{padding:"5px"}}
-                    margin="normal"
-                    onChange={this.handleChange('amount')}
-                  />
-
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={this.state.monthly}
-                          onChange={this.handleChangeCheckbox('monthly')}
-                          value="monthly"
-                          color="primary"
-                        />
-                      }
-                      style={{marginTop: "-25px"}}
-                      label="Miesięcznie"
-                    />
-                </tr>
-              </td>
-            </table>
-
-            <table>
-              <td>                
-                <tr>
-                  <TextField
-                    id="hostingLogin"
-                    label="Login do hostingu"
-                    type="text"
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    style={{padding:"5px"}}
-                    margin="normal"
-                    required = "true"
-                    onChange={this.handleChange('hostingLogin')}
-                  />
-
-                  <TextField
-                    id="hostingPassword"
-                    label="Hasło do hostingu"
-                    type="password"
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    style={{padding:"5px"}}
-                    margin="normal"
-                    required = "true"
-                    onChange={this.handleChange('hostingPassword')}
-                  />
-                </tr>
-
-                <tr>
-                  <TextField
-                    id="domainLogin"
-                    label="Login do domeny"
-                    type="text"
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    style={{padding:"5px"}}
-                    margin="normal"
-                    required = "true"
-                    onChange={this.handleChange('domainLogin')}
-                  />
-
-                  <TextField
-                    id="domainPassword"
-                    label="Hasło do domeny"
-                    type="password"
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    style={{padding:"5px"}}
-                    margin="normal"
-                    required = "true"
-                    onChange={this.handleChange('domainPassword')}
-                  />
-                </tr>
-
-                <tr>
-                  <TextField
-                    id="contact"
-                    label="Nr. do klienta"
-                    type="text"
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    style={{padding:"5px"}}
-                    margin="normal"
-                    onChange={this.handleChange('clientNumber')}
-                  />
-                  <TextField
-                    id="port"
-                    label="Port"
-                    type="number"
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    style={{padding:"5px"}}
-                    margin="normal"
-                    onChange={this.handleChange('port')}
-                  />
-                </tr>
-
-                <tr>
-                  <div style={{marginLeft:'-20%', minWidth:'620px', maxWidth:'620px'}}>
-                    <ReactQuill 
-                      value={this.state.description || ''}
-                      onChange={this.changeDescription}
-                    />
-                  </div>
-                </tr>
-              </td>
-            </table>
-          </div>
+      <div>
+        <div style={{float:'right', marginRight:'1.5%'}}>
+          <Button color="primary" style={{marginLeft:'unset', marginTop:'10px'}} onClick={Cancel}>
+            Cofnij
+          </Button>
         </div>
 
-        <div style={{marginLeft:"130px"}}>
+        <div style={{marginLeft: '40%'}}>
+          <div>
+            <div style={{marginTop: '-8%'}}>
+              <table>
+                <td>
+                  <tr>
+                    <TextField
+                      id="name"
+                      label="Nazwa projektu"
+                      placeholder="Np.BPC"
+                      margin="normal"
+                      style={{padding:"5px"}}
+                      required={true}
+                      onChange={this.handleChange('name')}
+                    />
 
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={this.state.old}
-                onChange={this.handleChangeCheckbox('old')}
-                value="old"
-                color="primary"
-              />
-            }
-            label="Stary projekt"
+                    <FormControl style={{minWidth:166, maxWidth: 166, padding:"5px"}}>
+                    <InputLabel htmlFor="tag-multiple">Uzytkownicy</InputLabel>
+                    <Select
+                      multiple
+                      value={[...this.state.tag]}
+                      onChange={this.handleTagChange}
+                      input={<Input id="tag-multiple" />}
+                      renderValue={selected => `Wybranych: ${selected.length}`}
+                    >
+                      {this.state.values.map(tag => (
+                        <MenuItem key={tag.id} value={tag._id}>
+                          <Checkbox checked={this.state.tag.has(tag._id)} />
+                          <ListItemText primary={tag.name + ' ' + tag.surname} />
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    </FormControl>
+                  </tr>
+
+                  <tr>
+                    <TextField
+                      id="number"
+                      label="Kwota"
+                      type="number"
+                      required="true"
+                      InputLabelProps={{
+                        shrink: true
+                      }}
+                      style={{padding:"5px"}}
+                      margin="normal"
+                      onChange={this.handleChange('amount')}
+                    />
+
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={this.state.monthly}
+                            onChange={this.handleChangeCheckbox('monthly')}
+                            value="monthly"
+                            color="primary"
+                          />
+                        }
+                        style={{marginTop: "-25px"}}
+                        label="Miesięcznie"
+                      />
+                  </tr>
+                </td>
+              </table>
+
+              <table>
+                <td>                
+                  <tr>
+                    <TextField
+                      id="hostingLogin"
+                      label="Login do hostingu"
+                      type="text"
+                      InputLabelProps={{
+                        shrink: true
+                      }}
+                      style={{padding:"5px"}}
+                      margin="normal"
+                      required = "true"
+                      onChange={this.handleChange('hostingLogin')}
+                    />
+
+                    <TextField
+                      id="hostingPassword"
+                      label="Hasło do hostingu"
+                      type="password"
+                      InputLabelProps={{
+                        shrink: true
+                      }}
+                      style={{padding:"5px"}}
+                      margin="normal"
+                      required = "true"
+                      onChange={this.handleChange('hostingPassword')}
+                    />
+                  </tr>
+
+                  <tr>
+                    <TextField
+                      id="domainLogin"
+                      label="Login do domeny"
+                      type="text"
+                      InputLabelProps={{
+                        shrink: true
+                      }}
+                      style={{padding:"5px"}}
+                      margin="normal"
+                      required = "true"
+                      onChange={this.handleChange('domainLogin')}
+                    />
+
+                    <TextField
+                      id="domainPassword"
+                      label="Hasło do domeny"
+                      type="password"
+                      InputLabelProps={{
+                        shrink: true
+                      }}
+                      style={{padding:"5px"}}
+                      margin="normal"
+                      required = "true"
+                      onChange={this.handleChange('domainPassword')}
+                    />
+                  </tr>
+
+                  <tr>
+                    <TextField
+                      id="contact"
+                      label="Nr. do klienta"
+                      type="text"
+                      InputLabelProps={{
+                        shrink: true
+                      }}
+                      style={{padding:"5px"}}
+                      margin="normal"
+                      onChange={this.handleChange('clientNumber')}
+                    />
+                    <TextField
+                      id="port"
+                      label="Port"
+                      type="number"
+                      InputLabelProps={{
+                        shrink: true
+                      }}
+                      style={{padding:"5px"}}
+                      margin="normal"
+                      onChange={this.handleChange('port')}
+                    />
+                  </tr>
+
+                  <tr>
+                    <div style={{marginLeft:'-20%', minWidth:'620px', maxWidth:'620px'}}>
+                      <ReactQuill 
+                        value={this.state.description || ''}
+                        onChange={this.changeDescription}
+                      />
+                    </div>
+                  </tr>
+                </td>
+              </table>
+            </div>
+          </div>
+
+          <div style={{marginLeft:"130px"}}>
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={this.state.old}
+                  onChange={this.handleChangeCheckbox('old')}
+                  value="old"
+                  color="primary"
+                />
+              }
+              label="Stary projekt"
+            />
+
+            <br/>
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={this.state.hosting}
+                  onChange={this.handleChangeCheckbox('hosting')}
+                  value="hosting"
+                  color="primary"
+                />
+              }
+              label="Hosting"
+            />
+            
+            {this.showHosting()}
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={this.state.domain}
+                  onChange={this.handleChangeCheckbox('domain')}
+                  value="domain"
+                  color="primary"
+                />
+              }
+              label="Domena"
+            />
+
+            {this.showDomain()}
+          </div>
+
+          <Button color="primary" style={{marginLeft:'107px', marginTop:'10px'}} onClick={doSomething}>
+            Dodaj projekt
+          </Button>
+      
+          <Snackbar
+            open={this.state.open}
+            message="Dodano projekt"
+            autoHideDuration={2000}
+            onClose={this.handleRequestClose}
           />
 
-          <br/>
+          <Snackbar
+            open={this.state.openError}
+            message="Bląd podczas dodawania"
+            autoHideDuration={2000}
+            onClose={this.handleRequestClose}
+          />
 
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={this.state.hosting}
-                onChange={this.handleChangeCheckbox('hosting')}
-                value="hosting"
-                color="primary"
-              />
-            }
-            label="Hosting"
+          <Snackbar
+            open={this.state.openErrorName}
+            message="Nie wpisano nazwy"
+            autoHideDuration={1000}
           />
           
-          {this.showHosting()}
-
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={this.state.domain}
-                onChange={this.handleChangeCheckbox('domain')}
-                value="domain"
-                color="primary"
-              />
-            }
-            label="Domena"
+          <Snackbar
+            open={this.state.openErrorAmount}
+            message="Nie wpisano kwoty"
+            autoHideDuration={1000}
           />
-
-          {this.showDomain()}
         </div>
-
-        <Button color="primary" style={{marginLeft:'107px', marginTop:'10px'}} onClick={doSomething}>
-          Dodaj projekt
-        </Button>
-    
-        <Snackbar
-          open={this.state.open}
-          message="Dodano projekt"
-          autoHideDuration={2000}
-          onClose={this.handleRequestClose}
-        />
-
-        <Snackbar
-          open={this.state.openError}
-          message="Bląd podczas dodawania"
-          autoHideDuration={2000}
-          onClose={this.handleRequestClose}
-        />
-
-        <Snackbar
-          open={this.state.openErrorName}
-          message="Nie wpisano nazwy"
-          autoHideDuration={1000}
-        />
-        
-        <Snackbar
-          open={this.state.openErrorAmount}
-          message="Nie wpisano kwoty"
-          autoHideDuration={1000}
-        />
       </div>
     )
   }

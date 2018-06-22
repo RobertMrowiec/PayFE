@@ -16,6 +16,8 @@ import { DatePicker } from 'material-ui-pickers';
 import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
 import plLocale from 'date-fns/locale/pl';
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+import 'react-day-picker/lib/style.css';
 
 const styles = {
   container: {
@@ -111,12 +113,26 @@ class AddSalaries extends React.Component {
     if (this.state.potentially){
       return (
         <div style={{marginBottom: '10px'}}>
-          <MuiPickersUtilsProvider utils={DateFnsUtils} >
+          {/* <MuiPickersUtilsProvider utils={DateFnsUtils} >
             <DatePicker
               value={this.state.date}
               onChange={this.handleDateChange}
             />
-          </MuiPickersUtilsProvider>
+          </MuiPickersUtilsProvider> */}
+
+          {/* <DayPickerInput onDayChange={this.handleDateChange}/> */}
+          <TextField
+            id="selectedDate"
+            label="Potencjalna data"
+            type="date"
+            InputLabelProps={{
+              shrink: true
+            }}
+            style={{padding:"5px"}}
+            margin="normal"
+            onChange={this.handleDateChange}
+          />
+
         </div>
       )
     } else {
@@ -183,6 +199,10 @@ class AddSalaries extends React.Component {
       )
     }
 
+    let Cancel = () => {
+      {this.setState({redirect: true})}
+    }
+
     let changeSnackBar = () => {
       this.setState({
         open: true,
@@ -247,111 +267,120 @@ class AddSalaries extends React.Component {
     }
 
     return (
-      <div style={styles.div}>
-        <TextField
-          id="title"
-          label="Temat"
-          placeholder="Np. Za super pracę!"
-          margin="normal"
-          onChange={this.handleChange('title')}
-        />
+      <div>
 
-        <TextField
-          id="amount"
-          label="Kwota"
-          type="number"
-          required="true"
-          InputLabelProps={{
-            shrink: true
-          }}
-          margin="normal"
-          onChange={this.handleChange('amount')}
-        />
-
-
-        <FormControl style={{minWidth:166, maxWidth: 166}}>
-          <InputLabel htmlFor="projects-simple"> Projekt </InputLabel>
-          <Select
-            value={this.state.projectId}
-            onChange={this.handleChangeProject('projectId')}
-            inputProps={{
-              name: 'projects',
-              id: 'projects-simple',
-            }}
-          >
-            {this.state.projects.map(proj => (
-              <MenuItem key = {proj.id} value = {proj._id}>
-                <ListItemText primary = {proj.name} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        
-        {this.disableUserForm()}
-        
-        <div></div>
-
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={this.state.potentially}
-              onChange={this.handleChangeCheckbox('potentially')}
-              value="potentially"
-              color="primary"
-            />
-          }
-          label="Potencjalna"
-        />
-
-        <div></div>
-
-        {/* {this.datePickerForm()} */}
-
-        <div style={{marginLeft:'-220px', minWidth:'620px', maxWidth:'620px'}}>
-          <ReactQuill 
-            value={this.state.description || ''}
-            onChange={this.changeDescription}
-          />
+        <div style={{marginTop:'1.5%', float:'right',marginRight:'1.5%'}}>
+          <Button color="primary" style={{marginLeft:'unset', marginTop:'10px'}} onClick={Cancel}>
+            Cofnij
+          </Button>
         </div>
 
-        <Button color="primary" style={{marginLeft:'4.7%', marginTop:'10px'}} onClick={doSomething}>
-            Dodaj wypłatę
-          </Button>
-      
-          <Snackbar
-            open={this.state.open}
-            message="Dodano wypłatę"
-            autoHideDuration={2000}
-            onClose={this.handleRequestClose}
+        <div style={styles.div}>
+          <TextField
+            id="title"
+            label="Temat"
+            placeholder="Np. Za super pracę!"
+            margin="normal"
+            onChange={this.handleChange('title')}
           />
 
-          <Snackbar
-            open={this.state.openError}
-            message="Błąd podczas dodawania"
-            autoHideDuration={2000}
-            onClose={this.handleRequestClose}
+          <TextField
+            id="amount"
+            label="Kwota"
+            type="number"
+            required="true"
+            InputLabelProps={{
+              shrink: true
+            }}
+            margin="normal"
+            onChange={this.handleChange('amount')}
           />
 
-          <Snackbar
-            open={this.state.openAmountError}
-            message="Nie wpisano kwoty"
-            autoHideDuration={1000}
-            onClose={this.handleRequestClose}
+
+          <FormControl style={{minWidth:166, maxWidth: 166}}>
+            <InputLabel htmlFor="projects-simple"> Projekt </InputLabel>
+            <Select
+              value={this.state.projectId}
+              onChange={this.handleChangeProject('projectId')}
+              inputProps={{
+                name: 'projects',
+                id: 'projects-simple',
+              }}
+            >
+              {this.state.projects.map(proj => (
+                <MenuItem key = {proj.id} value = {proj._id}>
+                  <ListItemText primary = {proj.name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        
+          {this.disableUserForm()}
+          
+          <div></div>
+
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={this.state.potentially}
+                onChange={this.handleChangeCheckbox('potentially')}
+                value="potentially"
+                color="primary"
+              />
+            }
+            label="Potencjalna"
           />
 
-          <Snackbar
-            open={this.state.openUserError}
-            message="Nie wybrano programisty"
-            autoHideDuration={2000}
-            onClose={this.handleRequestClose}
-          />
+          <div></div>
 
-          <Snackbar
-            open={this.state.openMoneyError}
-            message="Brak pieniędzy w projekcie"
-            autoHideDuration={2000}
-            onClose={this.handleRequestClose}
-          />
+          {this.datePickerForm()}
+
+          <div style={{marginLeft:'-220px', minWidth:'620px', maxWidth:'620px'}}>
+            <ReactQuill 
+              value={this.state.description || ''}
+              onChange={this.changeDescription}
+            />
+          </div>
+
+          <Button color="primary" style={{marginLeft:'4.7%', marginTop:'10px'}} onClick={doSomething}>
+              Dodaj wypłatę
+            </Button>
+        
+            <Snackbar
+              open={this.state.open}
+              message="Dodano wypłatę"
+              autoHideDuration={2000}
+              onClose={this.handleRequestClose}
+            />
+
+            <Snackbar
+              open={this.state.openError}
+              message="Błąd podczas dodawania"
+              autoHideDuration={2000}
+              onClose={this.handleRequestClose}
+            />
+
+            <Snackbar
+              open={this.state.openAmountError}
+              message="Nie wpisano kwoty"
+              autoHideDuration={1000}
+              onClose={this.handleRequestClose}
+            />
+
+            <Snackbar
+              open={this.state.openUserError}
+              message="Nie wybrano programisty"
+              autoHideDuration={2000}
+              onClose={this.handleRequestClose}
+            />
+
+            <Snackbar
+              open={this.state.openMoneyError}
+              message="Brak pieniędzy w projekcie"
+              autoHideDuration={2000}
+              onClose={this.handleRequestClose}
+            />
+        </div>
       </div>
     );
   }

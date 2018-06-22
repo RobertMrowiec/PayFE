@@ -68,6 +68,7 @@ class AddUser extends React.Component {
 
   render() {
 
+
     const { redirect } = this.state
     const { redirectLogin } = this.state
 
@@ -81,6 +82,8 @@ class AddUser extends React.Component {
         <Redirect to={{pathname: '/app/users' }}/>
       )
     }
+
+    let Cancel = () => this.setState({redirect: true})
 
     let changeSnackBar = () => {
       this.setState({
@@ -161,87 +164,97 @@ class AddUser extends React.Component {
     }
 
     return (
-      <div style={styles.div}>
-        <TextField
-          id="name"
-          label="Imie"
-          placeholder="Np. Jan"
-          required='true'
-          margin="normal"
-          autoComplete="off"
-          onChange={this.handleChange('name')}
-        />
-        <TextField
-          id="surname"
-          label="Nazwisko"
-          placeholder="Np. Kowalski"
-          required='true'
-          margin="normal"
-          autoComplete="off"
-          onChange={this.handleChange('surname')}
-        />
-        <TextField
-          id="email"
-          label="Email"
-          required='true'
-          placeholder="Np. kowalski@gmail.com"
-          margin="normal"
-          autoComplete="off"
-          onChange={this.handleChange('email')}
-        />
+      <div>
 
-        <TextField
-          id="password"
-          type="password"
-          label="Password"
-          placeholder="Np. qwe123 :)"
-          required='true'
-          margin="normal"
-          autoComplete="off"
-          onChange={this.handleChange('password')}
-        />
+        <div style={{marginTop:'1.5%', float:'right',marginRight:'1.5%'}}>
+          <Button color="primary" style={{marginLeft:'unset', marginTop:'10px'}} onClick={Cancel}>
+            Cofnij
+          </Button>
+        </div>
 
-        <Button color="primary" style={{paddingLeft:'8px', marginTop:'10px'}} onClick={doSomething}>
+        <div style={styles.div}>
+
+          <TextField
+            id="name"
+            label="Imie"
+            placeholder="Np. Jan"
+            required='true'
+            margin="normal"
+            autoComplete="off"
+            onChange={this.handleChange('name')}
+          />
+          <TextField
+            id="surname"
+            label="Nazwisko"
+            placeholder="Np. Kowalski"
+            required='true'
+            margin="normal"
+            autoComplete="off"
+            onChange={this.handleChange('surname')}
+          />
+          <TextField
+            id="email"
+            label="Email"
+            required='true'
+            placeholder="Np. kowalski@gmail.com"
+            margin="normal"
+            autoComplete="off"
+            onChange={this.handleChange('email')}
+          />
+
+          <TextField
+            id="password"
+            type="password"
+            label="Password"
+            placeholder="Np. qwe123 :)"
+            required='true'
+            margin="normal"
+            autoComplete="off"
+            onChange={this.handleChange('password')}
+          />
+
+          <Button color="primary" style={{paddingLeft:'8px', marginTop:'10px'}} onClick={doSomething}>
             Dodaj uzytkownika
           </Button>
-      
-          <Snackbar
-            open={this.state.open}
-            message="Dodano uzytkownika"
-            autoHideDuration={2000}
-            onClose={this.handleRequestClose}
-          />
+        
+            <Snackbar
+              open={this.state.open}
+              message="Dodano uzytkownika"
+              autoHideDuration={2000}
+              onClose={this.handleRequestClose}
+            />
 
-          <Snackbar
-            open={this.state.openError}
-            message="Błąd serwera"
-            autoHideDuration={2000}
-            onClose={this.handleRequestClose}
-          />
+            <Snackbar
+              open={this.state.openError}
+              message="Błąd serwera"
+              autoHideDuration={2000}
+              onClose={this.handleRequestClose}
+            />
 
-          <Snackbar
-            open={this.state.openName}
-            message="Nie wpisano imienia"
-            autoHideDuration={1000}
-          />
-          
-          <Snackbar
-            open={this.state.openPassword}
-            message="Nie wpisano imienia"
-            autoHideDuration={1000}
-          />
+            <Snackbar
+              open={this.state.openName}
+              message="Nie wpisano imienia"
+              autoHideDuration={1000}
+            />
+            
+            <Snackbar
+              open={this.state.openPassword}
+              message="Nie wpisano imienia"
+              autoHideDuration={1000}
+            />
 
-          <Snackbar
-            open={this.state.openSurname}
-            message="Nie wpisano nazwiska"
-            autoHideDuration={1000}
-          />
+            <Snackbar
+              open={this.state.openSurname}
+              message="Nie wpisano nazwiska"
+              autoHideDuration={1000}
+            />
 
-          <Snackbar
-            open={this.state.openEmail}
-            message="Niepoprawny email"
-            autoHideDuration={1000}
-          />
+            <Snackbar
+              open={this.state.openEmail}
+              message="Niepoprawny email"
+              autoHideDuration={1000}
+            />
+        </div>
       </div>
     );
   }

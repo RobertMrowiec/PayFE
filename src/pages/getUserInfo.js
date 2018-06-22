@@ -24,10 +24,9 @@ const styles = theme => ({
     alignItems: 'flex-start',
     padding: theme.spacing.unit / 2,
     marginLeft: '51%',
-    marginTop: '-120px',
-    marginBottom: '125px'
+    marginTop: '-48px',
+    marginBottom: '40px'
   },
-
   table: {
     minWidth: 700
   },
@@ -72,6 +71,8 @@ class GetUserInfo extends Component {
       chipData: []
   }
 
+  Cancel = () => this.setState({redirect: true})
+
   componentDidMount() {
     fetch('https://reactmanagebe.herokuapp.com/api/users/' + this.props.match.params.id, {credentials: 'include'})
       .then( response => response.json())
@@ -93,7 +94,7 @@ class GetUserInfo extends Component {
         if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
       })
   }
-
+  
   changeSalary = event => {
     this.setState({ age: event.target.value});
     fetch('https://reactmanagebe.herokuapp.com/api/salaries/user/' + this.props.match.params.id + '/date/' + event.target.value, {credentials: 'include'})
@@ -115,6 +116,7 @@ class GetUserInfo extends Component {
     const { classes } = this.props;
     const { salaries } = this.state;
     const { redirectLogin } = this.state
+    const { redirect } = this.state
     const { isLoading } = this.state
 
     if (isLoading) {
@@ -126,94 +128,108 @@ class GetUserInfo extends Component {
       }}/>
     }
 
+    if (redirect) {
+      return (
+        <Redirect to={{pathname: '/app/users' }}/>
+      )
+    }
+
     if (redirectLogin) {
       return (
         <Redirect to={{pathname: '/login' }}/>
       )
     }
     return (
-      <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '20px'}}>
-          <Card style = {{width: '50%'}}>
-            <CardContent>
-              <Typography>Dane uzytkownika:</Typography>
-              <Typography type="headline" component="h3">
-                {this.state.name} {this.state.surname}
-              </Typography>
-              <Typography >Adres email</Typography>
-              <Typography>
-                {this.state.email}
-              </Typography>
-            </CardContent>
-          </Card>
-
-          <Paper className={classes.rootChip}>
-          {this.state.chipData.map(data => {
-            return (
-              <Chip
-                key={data._id}
-                label={data.name}
-                onDelete={this.handleDelete(data)}
-                className={classes.chip}
-                />
-              );
-            })}
-          </Paper>
-          
-          <FormControl className={classes.formControl}>
-          <InputLabel htmlFor="age-simple">Data</InputLabel>
-            <Select
-              value={this.state.age}
-              onChange={this.changeSalary}
-              displayEmpty
-              name="age"
-              className={classes.selectEmpty}
-            >
-              <MenuItem value={7}>
-                <em>7 dni</em>
-              </MenuItem>
-              <MenuItem value={30}>Miesiąc</MenuItem>
-              <MenuItem value={365}>Rok</MenuItem>
-              <MenuItem value={0}>Całość</MenuItem>
-            </Select>
-          </FormControl>
-
-          <Paper className={styles.root}>
-            <Table className={styles.table}>
-              <TableHead>
-                <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Kwota</TableCell>
-                  <TableCell>Projekt</TableCell>
-                  <TableCell>Data</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {salaries.map((salary, i) => {
-                  if (salary.projectId != null){
-                    return (
-                      <TableRow key={i}>
-                        <TableCell>{i + 1}</TableCell>
-                        <TableCell>{salary.amount.toFixed(2)} zł</TableCell> 
-                        <TableCell>{salary.projectId.name}</TableCell>
-                        <TableCell>{salary.date}</TableCell>
-                      </TableRow>
-                    );
-                  }
-                  else {
-                    return (
-                      <TableRow key={i}>
-                        <TableCell>{i + 1}</TableCell>
-                        <TableCell>{salary.amount.toFixed(2)} zł</TableCell> 
-                        <TableCell></TableCell>
-                        <TableCell>{salary.date}</TableCell>
-                      </TableRow>
-                    );
-                  }
-                })}
-              </TableBody>
-            </Table>
-          </Paper>
+      <div>
+        <div style={{float:'right',marginRight:'1.3%'}}>
+          <Button color="primary" style={{marginLeft:'unset', marginTop:'10px'}} onClick={this.Cancel}>
+            Cofnij
+          </Button>
         </div>
+
+        <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '20px'}}>
+            <Card style = {{width: '50%'}}>
+              <CardContent>
+                <Typography>Dane uzytkownika:</Typography>
+                <Typography type="headline" component="h3">
+                  {this.state.name} {this.state.surname}
+                </Typography>
+                <Typography >Adres email</Typography>
+                <Typography>
+                  {this.state.email}
+                </Typography>
+              </CardContent>
+            </Card>
+
+            <Paper className={classes.rootChip}>
+            {this.state.chipData.map(data => {
+              return (
+                <Chip
+                  key={data._id}
+                  label={data.name}
+                  onDelete={this.handleDelete(data)}
+                  className={classes.chip}
+                  />
+                );
+              })}
+            </Paper>
+            
+            <FormControl className={classes.formControl}>
+            <InputLabel htmlFor="age-simple">Data</InputLabel>
+              <Select
+                value={this.state.age}
+                onChange={this.changeSalary}
+                displayEmpty
+                name="age"
+                className={classes.selectEmpty}
+              >
+                <MenuItem value={7}>
+                  <em>7 dni</em>
+                </MenuItem>
+                <MenuItem value={30}>Miesiąc</MenuItem>
+                <MenuItem value={365}>Rok</MenuItem>
+                <MenuItem value={0}>Całość</MenuItem>
+              </Select>
+            </FormControl>
+
+            <Paper className={styles.root}>
+              <Table className={styles.table}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>ID</TableCell>
+                    <TableCell>Kwota</TableCell>
+                    <TableCell>Projekt</TableCell>
+                    <TableCell>Data</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {salaries.map((salary, i) => {
+                    if (salary.projectId != null){
+                      return (
+                        <TableRow key={i}>
+                          <TableCell>{i + 1}</TableCell>
+                          <TableCell>{salary.amount.toFixed(2)} zł</TableCell> 
+                          <TableCell>{salary.projectId.name}</TableCell>
+                          <TableCell>{salary.date}</TableCell>
+                        </TableRow>
+                      );
+                    }
+                    else {
+                      return (
+                        <TableRow key={i}>
+                          <TableCell>{i + 1}</TableCell>
+                          <TableCell>{salary.amount.toFixed(2)} zł</TableCell> 
+                          <TableCell></TableCell>
+                          <TableCell>{salary.date}</TableCell>
+                        </TableRow>
+                      );
+                    }
+                  })}
+                </TableBody>
+              </Table>
+            </Paper>
+          </div>
+      </div>
     );
   }
 }

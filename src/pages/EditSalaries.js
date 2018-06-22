@@ -17,6 +17,8 @@ import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
 import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
 import DatePicker from 'material-ui-pickers/DatePicker';
 import plLocale from 'date-fns/locale/pl';
+import DayPickerInput from 'react-day-picker/DayPickerInput';
+import 'react-day-picker/lib/style.css';
 
 const style = {
   div: {
@@ -142,14 +144,7 @@ class EditSalaries extends React.Component {
               label="Potencjalna"
             />
           </div>
-          {/* <div style={{marginBottom: '10px'}}>
-            <MuiPickersUtilsProvider utils={DateFnsUtils} locale={plLocale}>
-              <DatePicker
-                value={this.state.selectedDate}
-                onChange={this.handleDateChange}
-              />
-            </MuiPickersUtilsProvider>
-          </div>       */}
+            <DayPickerInput onDayChange={this.handleDateChange} value={this.state.selectedDate}/>
         </div>      
       )
     }
@@ -189,6 +184,7 @@ class EditSalaries extends React.Component {
         <Redirect to={{pathname: '/login' }}/>
       )
     }
+
     if (redirect) {
       return (
         <Redirect to={{pathname: '/app/salaries' }}/>
@@ -240,100 +236,105 @@ class EditSalaries extends React.Component {
         .catch(changeSnackBarToError)
     }
     
-    let Cancel = () => {
-      {this.setState({redirect: true})}
-    }
+    let Cancel = () => this.setState({redirect: true})
+
     return (
-      
-      <div style={style.div}>
-        <TextField
-          id="title"
-          label="Tytuł"
-          placeholder={this.state.title}
-          margin="normal"
-          onChange={this.handleChange('title')}
-        />
-        
-        <TextField
-          id="amount"
-          label="Kwota"
-          type="number"
-          InputLabelProps={{
-            shrink: true
-          }}
-          placeholder={this.state.amount}
-          margin="normal"
-          onChange={this.handleChange('amount')}
-        />
-
-        <FormControl  style={{minWidth:166, maxWidth: 166}}>
-          <InputLabel htmlFor="projects-simple"> Projekt </InputLabel>
-          <Select
-            value={this.state.projectId}
-            onChange={this.handleChangeProject('projectId')}
-            inputProps={{
-              name: 'projects',
-              id: 'projects-simple',
-            }}
-          >
-            {this.state.projects.map(proj => (
-              <MenuItem key = {proj._id} value = {proj._id}>
-                <ListItemText primary = {proj.name} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl  style={{minWidth:166, maxWidth: 166}}>
-          <InputLabel htmlFor="users-simple"> Odbiorca </InputLabel>
-          <Select
-            value={this.state.userId}
-            onChange={this.handleChange('userId')}
-            inputProps={{
-              name: 'users',
-              id: 'users-simple',
-            }}
-          >
-            {this.state.users.map(user => (
-              <MenuItem key = {user._id} value = {user._id}>
-                <ListItemText primary = {user.name + ' ' + user.surname} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        {this.potentiallyFunction(this.state.potentially)}
-
-        <div style={{marginLeft:'-220px', minWidth:'620px', maxWidth:'620px'}}>
-          <ReactQuill 
-            value={this.state.description || ''}
-            onChange={this.changeDescription}
-          />
-        </div>
-
-        <br/>
-
+      <div>
+        <div style={{float:'right', marginRight:'1.5%'}}>
           <Button color="primary" style={{marginLeft:'unset', marginTop:'10px'}} onClick={Cancel}>
             Cofnij
           </Button>
-          <Button color="primary" style={{marginLeft:'4.7%', marginTop:'10px'}} onClick={Edit}>
-            Edytuj
-          </Button>
+        </div>
 
-          <Snackbar
-            open={this.state.open}
-            message="Edytowano wypłatę"
-            autoHideDuration={2000}
-            onClose={this.handleRequestClose}
+
+        <div style={style.div}>
+          <TextField
+            id="title"
+            label="Tytuł"
+            placeholder={this.state.title}
+            margin="normal"
+            onChange={this.handleChange('title')}
+          />
+          
+          <TextField
+            id="amount"
+            label="Kwota"
+            type="number"
+            InputLabelProps={{
+              shrink: true
+            }}
+            placeholder={this.state.amount}
+            margin="normal"
+            onChange={this.handleChange('amount')}
           />
 
-          <Snackbar
-            open={this.state.openError}
-            message="Błąd podczas edytowania"
-            autoHideDuration={2000}
-            onClose={this.handleRequestClose}
-          />
-      </div>    )
+          <FormControl  style={{minWidth:166, maxWidth: 166}}>
+            <InputLabel htmlFor="projects-simple"> Projekt </InputLabel>
+            <Select
+              value={this.state.projectId}
+              onChange={this.handleChangeProject('projectId')}
+              inputProps={{
+                name: 'projects',
+                id: 'projects-simple',
+              }}
+            >
+              {this.state.projects.map(proj => (
+                <MenuItem key = {proj._id} value = {proj._id}>
+                  <ListItemText primary = {proj.name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl  style={{minWidth:166, maxWidth: 166}}>
+            <InputLabel htmlFor="users-simple"> Odbiorca </InputLabel>
+            <Select
+              value={this.state.userId}
+              onChange={this.handleChange('userId')}
+              inputProps={{
+                name: 'users',
+                id: 'users-simple',
+              }}
+            >
+              {this.state.users.map(user => (
+                <MenuItem key = {user._id} value = {user._id}>
+                  <ListItemText primary = {user.name + ' ' + user.surname} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {this.potentiallyFunction(this.state.potentially)}
+
+          <div style={{marginLeft:'-220px', minWidth:'620px', maxWidth:'620px'}}>
+            <ReactQuill 
+              value={this.state.description || ''}
+              onChange={this.changeDescription}
+            />
+          </div>
+
+          <br/>
+
+            <Button color="primary" style={{marginLeft:'4.7%', marginTop:'10px'}} onClick={Edit}>
+              Edytuj
+            </Button>
+
+            <Snackbar
+              open={this.state.open}
+              message="Edytowano wypłatę"
+              autoHideDuration={2000}
+              onClose={this.handleRequestClose}
+            />
+
+            <Snackbar
+              open={this.state.openError}
+              message="Błąd podczas edytowania"
+              autoHideDuration={2000}
+              onClose={this.handleRequestClose}
+            />
+        </div>    
+      </div>
+    )
   }
 }
 

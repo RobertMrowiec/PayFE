@@ -98,7 +98,7 @@ class App extends Component {
           <Router>
             <div style={{marginTop:'90px', paddingLeft: '20px'}}>
               <Route exact path="/login" component={Login} />
-              <Route exact path="/" component={Default}/>
+              <Route exact path="/" component={Default}/>e
               <Route path="/app" component={Home} />
               <Route path="/app/dashboard" component={Dashboard} />
               <Route path="/app/lokomotywaTomek" component={LokomotywaTomek} />

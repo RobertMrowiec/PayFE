@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Redirect } from 'react-router-dom';
 import { CircularProgress } from 'material-ui/Progress';
-import Typography from 'material-ui/Typography';
+import Button from 'material-ui/Button';
 const style = {
   typo: {
     'marginLeft': '30%',
@@ -51,6 +51,8 @@ class GetProjectInfo extends Component {
       )
     }
     
+    let Cancel = () => this.setState({redirect: true})
+
     let data = {
       labels: this.state.users,
       datasets: [
@@ -68,8 +70,14 @@ class GetProjectInfo extends Component {
     }
   
     return (
-      <div style={{marginTop:'-5%', marginLeft: '162px', marginRight: '20px'}}>
-        <Line data={data} height={170} />
+      <div style={{marginTop: '-90px'}}>
+        <Button color="primary" style={{marginRight:'1.3%', float:'right'}} onClick={Cancel}>
+          Cofnij
+        </Button>
+
+        <div >
+          <Line data={data} />
+      </div>
       </div>
     )
   }

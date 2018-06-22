@@ -132,7 +132,7 @@ class EditProjects extends Component {
   showHosting() {
     if (this.state.hosting == true){
       return (
-        <div style={{marginLeft:'-210px'}}>
+        <div style={{display: 'flex', justifyContent: 'center', marginRight: '140px'}}>
           <TextField
             id="amountHosting"
             label="Kwota za hosting"
@@ -176,7 +176,7 @@ class EditProjects extends Component {
     }
     else {
       return (
-        <div>
+        <div >
         </div>
       )      
     }
@@ -185,7 +185,7 @@ class EditProjects extends Component {
   showDomain() {
     if (this.state.domain == true){
       return (
-        <div style={{marginLeft:'-210px'}}>
+        <div style={{display: 'flex', justifyContent: 'center', marginRight: '140px'}}>
             <TextField
             id="amountDomain"
             label="Kwota za domenę"
@@ -238,7 +238,7 @@ class EditProjects extends Component {
   oldFunction = value => {    
     if(value == true){
       return (
-        <div>
+        <div style={{display: 'flex', justifyContent: 'center', marginRight: '110px'}}>
           <FormControlLabel
             control={
               <Checkbox
@@ -255,7 +255,7 @@ class EditProjects extends Component {
     }
     else if (value == false) {
       return (
-        <div>
+        <div style={{display: 'flex', justifyContent: 'center', marginRight: '110px'}}>
           <FormControlLabel
             control={
               <Checkbox
@@ -364,16 +364,19 @@ class EditProjects extends Component {
     }
 
     return (
-      <div>
-        <div style={{marginTop:'-80px'}}>
+      <div style={{marginTop: '-4%'}}>
+        <div> 
+          <Button color="primary" style={{float:'right', marginTop: '-2%', marginRight: '1.3%'}} onClick={Cancel}>
+            Cofnij
+          </Button>
+        </div>
+
           <Typography variant = 'display1' align='center'> Aktualnie edytujesz projekt: </Typography>
           <Typography variant = 'display3' align='center'> {this.state.name} </Typography>
-        </div>
     
-        <div style={{marginLeft: '40%', marginTop: '4%'}}>
-          <div style={{display: 'flex'}}>
-            <div style={{marginTop: '-8%'}}>
-              <table>
+        <div>
+          <div>
+              <table style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                 <td>
                   <tr>
                     <TextField
@@ -434,7 +437,7 @@ class EditProjects extends Component {
                 </td>
               </table>
 
-              <table>
+              <table style={{display: 'flex', justifyContent: 'center', marginLeft: '265px'}}>
                 <td>                
                   <tr>
                     <TextField
@@ -531,8 +534,6 @@ class EditProjects extends Component {
                   </tr>
                 </td>
               </table>
-            </div>
-
           </div>
 
           <div style={{marginLeft:"130px"}}>
@@ -549,6 +550,7 @@ class EditProjects extends Component {
                 />
               }
               label="Hosting"
+              style={{display: 'flex', justifyContent:'center', marginRight: '155px'}}
             />
             
             {this.showHosting()}
@@ -563,16 +565,13 @@ class EditProjects extends Component {
                 />
               }
               label="Domena"
+              style={{display: 'flex', justifyContent:'center', marginRight: '152px'}}
             />
-
             {this.showDomain()}
           </div>
 
-          <div style={{marginLeft:'90px'}}>
-            <Button color="primary" style={{marginLeft:'unset', marginTop:'10px'}} onClick={Cancel}>
-              Cofnij
-            </Button>
-            <Button color="primary" style={{paddingLeft:'8px', marginTop:'10px'}} onClick={Edit}>
+          <div style={{display: 'flex', justifyContent:'center', marginRight: '50px'}}>
+            <Button color="primary" style={{paddingLeft:'20px', marginTop:'10px'}} onClick={Edit}>
               Edytuj
             </Button>
           </div>

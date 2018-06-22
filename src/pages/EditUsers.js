@@ -166,7 +166,14 @@ class EditUser extends React.Component {
         .catch(changeSnackBarToError)
     }
     return (
-      <div style={styles.div}>
+      <div>
+        <div style={{marginTop:'1.5%', float:'right',marginRight:'1.5%'}}>
+          <Button color="primary" style={{marginLeft:'unset', marginTop:'10px'}} onClick={Cancel}>
+            Cofnij
+          </Button>
+        </div>
+
+        <div style={styles.div}>
 
         <TextField
           id="name"
@@ -204,7 +211,7 @@ class EditUser extends React.Component {
         <Button color="primary" style={{marginLeft:'unset', marginTop:'10px'}} onClick={Cancel}>
           Cofnij
         </Button>
-        <Button color="primary" style={{marginLeft:'4.7%', marginTop:'10px'}} onClick={Edit}>
+        <Button color="primary" style={{marginTop:'10px'}} onClick={Edit}>
           Edytuj
         </Button>
 
@@ -223,6 +230,7 @@ class EditUser extends React.Component {
         />
 
       </div>
+    </div>
     )
   }
 }
