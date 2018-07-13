@@ -8,14 +8,10 @@ import Snackbar from 'material-ui/Snackbar';
 import Button from 'material-ui/Button';
 import { Redirect } from 'react-router-dom';
 import { ListItemText } from 'material-ui/List';
-import { FormGroup, FormControlLabel } from 'material-ui/Form';
+import { FormControlLabel } from 'material-ui/Form';
 import Checkbox from 'material-ui/Checkbox';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { DatePicker } from 'material-ui-pickers';
-import DateFnsUtils from 'material-ui-pickers/utils/date-fns-utils';
-import MuiPickersUtilsProvider from 'material-ui-pickers/utils/MuiPickersUtilsProvider';
-import plLocale from 'date-fns/locale/pl';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import 'react-day-picker/lib/style.css';
 
@@ -120,19 +116,7 @@ class AddSalaries extends React.Component {
             />
           </MuiPickersUtilsProvider> */}
 
-          {/* <DayPickerInput onDayChange={this.handleDateChange}/> */}
-          <TextField
-            id="selectedDate"
-            label="Potencjalna data"
-            type="date"
-            InputLabelProps={{
-              shrink: true
-            }}
-            style={{padding:"5px"}}
-            margin="normal"
-            onChange={this.handleDateChange}
-          />
-
+          <DayPickerInput onDayChange={this.handleDateChange}/>
         </div>
       )
     } else {
