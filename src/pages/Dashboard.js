@@ -125,7 +125,7 @@ class Home extends Component {
         </div>
       )
     }
-    else {      
+    else {
       let data = {
         labels: this.state.users,
         datasets: [{
@@ -142,7 +142,7 @@ class Home extends Component {
 
       return (
         <div style={{paddingLeft: '150px', marginTop: '-6%', width:'90%'}}>
-            <Line data={data} height={150}/>
+          <Line data={data} height={150}/>
         </div>
       )
     }

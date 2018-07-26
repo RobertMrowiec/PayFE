@@ -15,6 +15,7 @@ import Dialog, {
   DialogActions,
   DialogTitle
 } from 'material-ui/Dialog';
+import '../App.css';
 
 const styles = theme => ({
   root: {
@@ -50,6 +51,15 @@ class GetProjectSalaries extends Component {
     const { isLoading } = this.state
     const { salaries } = this.state
     const { logged } = this.state
+    const { redirect } = this.state
+
+    let Cancel = () => this.setState({redirect: true})
+
+    if (redirect) {
+      return (
+        <Redirect to={{pathname: '/app/projects'}}/>
+      )
+    }
 
     if (isLoading) {
       return <CircularProgress style={{
@@ -65,7 +75,10 @@ class GetProjectSalaries extends Component {
           <Typography variant = 'headline' align='center'> Wypłaty: </Typography>
         </div>
 
-        <div style = {{marginLeft: '94%', marginBottom: '0.5%'}}>
+        <div style = {{marginLeft: '84%', marginBottom: '0.5%'}}>
+            <Button color="primary" onClick={Cancel}>
+              Cofnij
+          </Button>
           <Button fab mini color="primary" aria-label="add" className={styles.button} component={Link} to="/app/addProjects">
             <AddIcon />
           </Button>
