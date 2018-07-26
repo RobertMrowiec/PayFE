@@ -3,13 +3,7 @@ import { Line } from 'react-chartjs-2';
 import { Redirect } from 'react-router-dom';
 import { CircularProgress } from 'material-ui/Progress';
 import Button from 'material-ui/Button';
-const style = {
-  typo: {
-    'marginLeft': '30%',
-    'marginTop': '20%'
-  }
-}
-
+import Typography from 'material-ui/Typography';
 class GetProjectInfo extends Component {
   constructor(props) {
       super(props);
@@ -23,7 +17,7 @@ class GetProjectInfo extends Component {
     fetch('https://reactmanagebe.herokuapp.com/api/dashboards/projects/' + this.props.match.params.id, {credentials: 'include'})
       .then( response => response.json())
       .then( data => {
-          this.setState({users: data.users, salaries: data.salary, allSalaries: data.allSalaries})
+          this.setState({users: data.users, salaries: data.salary, allSalaries: data.allSalaries, name: data.name})
       })
       .then(() => this.setState({isLoading: false}))
       .catch(err => {
@@ -33,6 +27,7 @@ class GetProjectInfo extends Component {
 
   render(){
     const { redirectLogin } = this.state
+    const { redirect } = this.state
     const { isLoading } = this.state
     const { sumData } = this.state
 
@@ -44,7 +39,11 @@ class GetProjectInfo extends Component {
         'margin-top': '24%'
       }}/>
     }
-
+    if (redirect) {
+      return (
+        <Redirect to={{pathname: '/app/projects'}}/>
+      )
+    }
     if (redirectLogin) {
       return (
         <Redirect to={{pathname: '/login' }}/>
@@ -70,14 +69,15 @@ class GetProjectInfo extends Component {
     }
   
     return (
-      <div style={{marginTop: '-90px'}}>
+      <div style={{marginTop: '-120px'}}>
         <Button color="primary" style={{marginRight:'1.3%', float:'right'}} onClick={Cancel}>
           Cofnij
         </Button>
 
-        <div >
-          <Line data={data} />
-      </div>
+        <div style={{paddingLeft: '150px', marginTop: '10px', width:'90%'}}>
+        <Typography variant = 'display3' align='center'> Projekt: {this.state.name} </Typography>
+          <Line data={data} height={150}/>
+        </div>
       </div>
     )
   }

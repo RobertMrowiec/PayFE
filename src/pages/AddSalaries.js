@@ -12,7 +12,7 @@ import { FormControlLabel } from 'material-ui/Form';
 import Checkbox from 'material-ui/Checkbox';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import DayPickerInput from 'react-day-picker/DayPickerInput';
+import DayPicker from 'react-day-picker/DayPicker';
 import 'react-day-picker/lib/style.css';
 
 const styles = {
@@ -108,15 +108,8 @@ class AddSalaries extends React.Component {
   datePickerForm() {
     if (this.state.potentially){
       return (
-        <div style={{marginBottom: '10px'}}>
-          {/* <MuiPickersUtilsProvider utils={DateFnsUtils} >
-            <DatePicker
-              value={this.state.date}
-              onChange={this.handleDateChange}
-            />
-          </MuiPickersUtilsProvider> */}
-
-          <DayPickerInput onDayChange={this.handleDateChange}/>
+        <div style={{marginLeft: '-40px'}}>
+          <DayPicker firstDayOfWeek={1} onDayChange={this.handleDateChange}/>
         </div>
       )
     } else {

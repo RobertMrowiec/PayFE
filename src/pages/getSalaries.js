@@ -16,6 +16,7 @@ import Dialog, {
 import { Redirect } from 'react-router-dom';
 import { CircularProgress } from 'material-ui/Progress';
 import Checkbox from 'material-ui/Checkbox';
+import '../App.css';
 
 const styles = theme => ({
   root: {
@@ -176,7 +177,7 @@ class GetSalaries extends Component {
                     <TableCell>{salary.userId.name} {salary.userId.surname}</TableCell>
                     <TableCell>{salary.projectId.name}</TableCell>
                     <TableCell>{salary.title}</TableCell>
-                    <TableCell>{salary.amount.toFixed(2)} zł</TableCell>
+                    <TableCell className="currencyTable">{salary.amount.toFixed(2)} zł</TableCell>
                     <TableCell>
                       <Checkbox
                         checked={salary.potentially}

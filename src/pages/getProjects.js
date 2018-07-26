@@ -15,6 +15,7 @@ import Dialog, {
   DialogActions,
   DialogTitle
 } from 'material-ui/Dialog';
+import '../App.css';
 
 const styles = theme => ({
   root: {
@@ -173,9 +174,9 @@ class GetProjects extends Component {
                     <TableRow key={i}>
                       <TableCell>{i + 1}</TableCell>
                       <TableCell onClick={ () => this.redirectFunction(project)}> {project.name} </TableCell> 
-                      <TableCell onClick={ () => this.redirectFunction(project)}> {project.amount.toFixed(2)} zł </TableCell>
-                      <TableCell onClick={ () => this.redirectFunction(project)}> {project.howmany.toFixed(2)} zł </TableCell>
-                      <TableCell onClick={ () => this.redirectFunction(project)}> {project.howmanyPotentially.toFixed(2)} zł </TableCell>
+                      <TableCell onClick={ () => this.redirectFunction(project)} className="currencyTable"> {project.amount.toFixed(2)} zł </TableCell>
+                      <TableCell onClick={ () => this.redirectFunction(project)} className="currencyTable"> {project.howmany.toFixed(2)} zł </TableCell>
+                      <TableCell onClick={ () => this.redirectFunction(project)} className="currencyTable"> {project.howmanyPotentially.toFixed(2)} zł </TableCell>
                       <TableCell onClick={ () => this.redirectFunction(project)}> {project.peoples} </TableCell>
                       <TableCell onClick={ () => this.redirectToSalaryFunction(project)}> {project.salaries} </TableCell>
                       <TableCell>
@@ -254,7 +255,7 @@ class GetProjects extends Component {
                     <TableRow key={i}>
                       <TableCell>{i + 1}</TableCell>
                       <TableCell>{project.name}</TableCell> 
-                      <TableCell>{project.amount.toFixed(2)} zł</TableCell>
+                      <TableCell className='currencyTable'>{project.amount.toFixed(2)} zł</TableCell>
                       <TableCell>{project.howmany.toFixed(2)} zł</TableCell>
                       <TableCell>{project.peoples}</TableCell>
                       <TableCell>{project.salaries}</TableCell>
