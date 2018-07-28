@@ -62,7 +62,9 @@ class Home extends Component {
       this.actualMonth(),
       this.monthAgo(),
       this.twoMonthsAgo(),
-      this.projectsActualMonth()
+      this.projectsActualMonth(),
+      this.projectsMonthAgo(),
+      this.projectsTwoMonthsAgo()
     ]).then(() => this.setState({isLoading: false}))
   }
   
@@ -109,6 +111,28 @@ class Home extends Component {
       .then( response => response.json())
       .then( data => {
         return this.setState({projectsList: data})
+      })
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
+      })
+  }
+
+  projectsMonthAgo() {
+    return fetch('https://reactmanagebe.herokuapp.com/api/dashboards/projects/months/one', {credentials: 'include'})
+      .then( response => response.json())
+      .then( data => {
+        return this.setState({projectsListMonthAgo: data})
+      })
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
+      })
+  }
+
+  projectsTwoMonthsAgo() {
+    return fetch('https://reactmanagebe.herokuapp.com/api/dashboards/projects/months/one', {credentials: 'include'})
+      .then( response => response.json())
+      .then( data => {
+        return this.setState({projectsListTwoMonthsAgo: data})
       })
       .catch(err => {
         if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
@@ -167,38 +191,116 @@ class Home extends Component {
       if (actualState.page && actualState.page.pageProjects){
         return (
           <div>
-            {/* <div>
-              <Button style={{float:'left', size: "10px"}} color="primary" onClick={() => ChangePage('LeftPage', true)}>
+            <div>
+              <Button style={{float:'left', size: "10px"}} color="primary" onClick={() => ChangePage('ProjectsMonthAgo', true)}>
                 Poprzedni miesiąc
               </Button>
-            </div> */}
-
-            <Paper>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Nazwa</TableCell>
-                    <TableCell>Suma</TableCell>
-                    <TableCell>Ilość wypłat</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {this.state.projectsList.map((project, i) => {
-                    return (
-                      <TableRow key={i}>
-                        <TableCell> {project.name} </TableCell> 
-                        <TableCell> {project.sum.toFixed(2)} zł </TableCell>
-                        <TableCell> {project.count} </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
-            </Paper>
+              <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Dashboard', true)}> Dashboard </Button> 
+              <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Developers', true)}> Programiści </Button> 
+              <br/>
+              <br/>
+              <br/>
+              <Paper>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Nazwa</TableCell>
+                      <TableCell>Suma</TableCell>
+                      <TableCell>Ilość wypłat</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {this.state.projectsList.map((project, i) => {
+                      return (
+                        <TableRow key={i}>
+                          <TableCell> {project.name} </TableCell> 
+                          <TableCell> {project.sum.toFixed(2)} zł </TableCell>
+                          <TableCell> {project.count} </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </Paper>
+            </div>
           </div>
         )
       }
 
+      if (actualState.page && actualState.page.pageProjectsMonthAgo){
+        return (
+          <div>
+            <div>
+              <Button style={{float:'left', size: "10px"}} color="primary" onClick={() => ChangePage('ProjectsTwoMonthsAgo', true)}>
+                Miesiąc w tył
+              </Button>
+              <Button style={{float:'right', size: "10px"}} color="primary" onClick={() => ChangePage('Projects', true)}>
+                Aktualny miesiąc
+              </Button>
+              <br/>
+              <br/>
+              <Paper>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Nazwa</TableCell>
+                      <TableCell>Suma</TableCell>
+                      <TableCell>Ilość wypłat</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {this.state.projectsListMonthAgo.map((project, i) => {
+                      return (
+                        <TableRow key={i}>
+                          <TableCell> {project.name} </TableCell> 
+                          <TableCell> {project.sum.toFixed(2)} zł </TableCell>
+                          <TableCell> {project.count} </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </Paper>
+            </div>
+          </div>
+        )
+      }
+
+      if (actualState.page && actualState.page.pageProjectsTwoMonthsAgo){
+        return (
+          <div>
+            <div>
+              <Button style={{float:'right', size: "10px"}} color="primary" onClick={() => ChangePage('ProjectsMonthAgo', true)}>
+                Miesiąc w przód
+              </Button>
+              <br/>
+              <br/>
+              <Paper>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Nazwa</TableCell>
+                      <TableCell>Suma</TableCell>
+                      <TableCell>Ilość wypłat</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {this.state.projectsListTwoMonthsAgo.map((project, i) => {
+                      return (
+                        <TableRow key={i}>
+                          <TableCell> {project.name} </TableCell> 
+                          <TableCell> {project.sum.toFixed(2)} zł </TableCell>
+                          <TableCell> {project.count} </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </Paper>
+            </div>
+          </div>
+        )
+      }
       if (actualState.page && actualState.page.pageDoubleLeft){
         return (
           <div>
@@ -229,7 +331,7 @@ class Home extends Component {
       return (
         <div>
           <div>
-            <Button color="primary" style={{float:'left'}} onClick={() => ChangePage('Left', true)}> Poprzedni miesiąc </Button> 
+            <Button color="primary" style={{float:'left'}} onClick={() => ChangePage('Left', true)}> Miesiąc w tył </Button> 
             <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Projects', true)}> Projekty </Button> 
             <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Developers', true)}> Programiści </Button> 
           </div>
