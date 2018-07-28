@@ -3,30 +3,11 @@ import { Line } from 'react-chartjs-2';
 import { Redirect } from 'react-router-dom';
 import { CircularProgress } from 'material-ui/Progress';
 import Typography from 'material-ui/Typography';
-import AppBar from 'material-ui/AppBar';
-import Drawer from 'material-ui/Drawer';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
-import Toolbar from 'material-ui/Toolbar';
-import injectTapEventPlugin from 'react-tap-event-plugin';
-import { ListItem, ListItemText } from 'material-ui/List';
-import {
-  BrowserRouter as Router,
-  Route
-} from 'react-router-dom'; 
-
-import GetProjects from './getProjects';
-import AddProjects from './AddProjects';
-import EditProjects from './EditProjects';
-import GetUsers from './getUsers';
-import GetUserInfo from './getUserInfo';
-import AddUsers from './AddUsers';
-import EditUsers from './EditUsers';
-import Login from './Login';
-import GetSalaries from './getSalaries';
-import AddSalaries from './AddSalaries';
-import EditSalaries from './EditSalaries';
 import Button from 'material-ui/Button';
+import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
+import Paper from 'material-ui/Paper';
 
 const styles = theme => ({
   typo: {
@@ -38,7 +19,6 @@ const styles = theme => ({
     flexGrow: 1,
     zIndex: 1,
     overflow: 'hidden',
-    // position: 'relative',
     display: 'flex',
   },
   appFrame: {
@@ -77,7 +57,17 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    fetch('https://reactmanagebe.herokuapp.com/api/dashboards/salaries', {credentials: 'include'})
+    this.setState({isLoading: true})
+    return Promise.all([
+      this.actualMonth(),
+      this.monthAgo(),
+      this.twoMonthsAgo(),
+      this.projectsActualMonth()
+    ]).then(() => this.setState({isLoading: false}))
+  }
+  
+  actualMonth() {
+    return fetch('https://reactmanagebe.herokuapp.com/api/dashboards/salaries', {credentials: 'include'})
       .then( response => response.json())
       .then( data => {
         if (!data.imiona){
@@ -87,65 +77,175 @@ class Home extends Component {
           return this.setState({users: data.imiona, potentiallySalaries: data.potencjalne, salaries: data.sumy, sumData: false})
         }
       })
-      .then(() => this.setState({isLoading: false}))
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
+      })
+  }
+
+  monthAgo() {
+    return fetch('https://reactmanagebe.herokuapp.com/api/dashboards/salaries/months/one', {credentials: 'include'})
+      .then( response => response.json())
+      .then( data => {
+        return this.setState({usersMonthAgo: data.imiona, potentiallySalariesMonthAgo: data.potencjalne, salariesMonthAgo: data.sumy, sumDataMonthAgo: false})
+      })
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
+      })
+  }
+
+  twoMonthsAgo() {
+    return fetch('https://reactmanagebe.herokuapp.com/api/dashboards/salaries/months/two', {credentials: 'include'})
+      .then( response => response.json())
+      .then( data => {
+        return this.setState({usersTwoMonthsAgo: data.imiona, potentiallySalariesTwoMonthsAgo: data.potencjalne, salariesTwoMonthsAgo: data.sumy, sumDataTwoMonthsAgo: false})
+      })
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
+      })
+  }
+
+  projectsActualMonth() {
+    return fetch('https://reactmanagebe.herokuapp.com/api/dashboards/projects', {credentials: 'include'})
+      .then( response => response.json())
+      .then( data => {
+        return this.setState({projectsList: data})
+      })
       .catch(err => {
         if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
       })
   }
 
   render(){
-    const { redirectLogin } = this.state
-    const { isLoading } = this.state
-    const { sumData } = this.state
-    const { classes } = this.props
 
-    let Cancel = () => this.setState({redirect: true})
-  
-    
-    if (isLoading) {
-      return <CircularProgress style={{
-        'width': '60px',
-        'height': '40px',
-        'margin-left': '44%',
-        'margin-top': '24%'
-      }}/>
-    }
-
-    if (redirectLogin) {
-      return (
-        <Redirect to={{pathname: '/login' }}/>
-      )
-    } 
-    
-    if (sumData){
-      return (
-        <div style={{textAlign:'center', marginTop:'15%'}}>
-          <Typography variant = 'display2' className={styles.typo}> W tym miesiącu zarobiłeś: {this.state.sum.toFixed(2)} zł
-          </Typography>
-        </div>
-      )
-    }
-    else {
-      let data = {
-        labels: this.state.users,
+    const dashboardData = (labels, firstLabel, firstData, secondLabel, secondData) => {
+      return {
+        labels: labels,
         datasets: [{
-          label: "Zarobki z tego miesiąca",
-          data: this.state.salaries,
+          label: firstLabel,
+          data: firstData,
           backgroundColor: 'rgba(103,220,114, 0.2)',
           borderColor: 'rgba(103,220,114, 0.2)',
         },
         {
-          label: "Potencjalne zarobki z tego miesiąca",
-          data: this.state.potentiallySalaries,
+          label: secondLabel,
+          data: secondData,
         }]
       }
+    }
 
+    const ChangePage = (side, status) => {
+      let page = {}
+      page['page' + side] = status
+      this.setState({page})
+    }    
+
+    const Result = (actualState) => {
+
+      if (actualState.redirectLogin) {
+        return <Redirect to={{pathname: '/login' }}/>
+      }
+
+      if (actualState.isLoading) {
+        return (
+        <CircularProgress style={{
+          'width': '60px',
+          'height': '40px',
+          'margin-left': '44%',
+          'margin-top': '24%'
+        }}/>
+        )
+      }
+
+      if (actualState.sumData) {
+        return (
+          <div style={{textAlign:'center', marginTop:'15%'}}>
+            <Typography variant = 'display2' className={styles.typo}> W tym miesiącu zarobiłeś: {actualState.sum.toFixed(2)} zł </Typography>
+          </div>
+        )
+      }
+
+      if (actualState.page && actualState.page.pageProjects){
+        return (
+          <div>
+            {/* <div>
+              <Button style={{float:'left', size: "10px"}} color="primary" onClick={() => ChangePage('LeftPage', true)}>
+                Poprzedni miesiąc
+              </Button>
+            </div> */}
+
+            <Paper>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Nazwa</TableCell>
+                    <TableCell>Suma</TableCell>
+                    <TableCell>Ilość wypłat</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {this.state.projectsList.map((project, i) => {
+                    return (
+                      <TableRow key={i}>
+                        <TableCell> {project.name} </TableCell> 
+                        <TableCell> {project.sum.toFixed(2)} zł </TableCell>
+                        <TableCell> {project.count} </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </Paper>
+          </div>
+        )
+      }
+
+      if (actualState.page && actualState.page.pageDoubleLeft){
+        return (
+          <div>
+            <div>
+              <Button style={{float:'right', size:"10px"}} color="primary" onClick={() => ChangePage('Left', true)}>
+                Miesiąc w przód
+              </Button>
+            </div>
+          
+            <Line data={dashboardData(actualState.users, 'Zarobki dwa miesiące temu', actualState.salariesTwoMonthsAgo, 'Potencjalne zarobki dwa miesiące temu', actualState.potentiallySalariesTwoMonthsAgo)} height={140}/>
+          </div>
+        )
+      }
+
+      if (actualState.page && actualState.page.pageLeft){
+        return (
+          <div>
+            <div>
+              <Button color="primary" style={{float:'left'}} onClick={() => ChangePage('DoubleLeft', true)}> Miesiąc w tył </Button> 
+              <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Left', false)}> Aktualny miesiąc </Button>
+            </div>
+          
+            <Line data={dashboardData(actualState.users, 'Zarobki miesiąc temu', actualState.salariesMonthAgo, 'Potencjalne zarobki miesiąc temu', actualState.potentiallySalariesMonthAgo)} height={140}/>
+          </div>
+        )
+      }
+      
       return (
-        <div style={{paddingLeft: '150px', marginTop: '-6%', width:'90%'}}>
-          <Line data={data} height={150}/>
+        <div>
+          <div>
+            <Button color="primary" style={{float:'left'}} onClick={() => ChangePage('Left', true)}> Poprzedni miesiąc </Button> 
+            <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Projects', true)}> Projekty </Button> 
+            <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Developers', true)}> Programiści </Button> 
+          </div>
+          
+          <Line data={dashboardData(actualState.users, "Zarobki z tego miesiąca", actualState.salaries, 'Potencjalne zarobki z tego miesiąca', actualState.potentiallySalaries)} height={140}/>
         </div>
       )
     }
+      return (
+        <div style={{paddingLeft: '150px', marginTop: '-6%', width:'91.5%'}}>
+          <Typography variant = 'display3' align='center'> Dashboard </Typography>
+
+          {Result(this.state)}
+
+        </div>
+      )
   }
 }
 
