@@ -340,6 +340,7 @@ class Home extends Component {
         </div>
       )
     }
+    
       return (
         <div style={{paddingLeft: '150px', marginTop: '-6%', width:'91.5%'}}>
           <Typography variant = 'display3' align='center'> Dashboard </Typography>
