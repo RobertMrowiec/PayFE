@@ -16,6 +16,12 @@ import Dialog, {
 import { Redirect } from 'react-router-dom';
 import { CircularProgress } from 'material-ui/Progress';
 import Checkbox from 'material-ui/Checkbox';
+import Select from 'material-ui/Select';
+import { MenuItem } from 'material-ui/Menu';
+import { InputLabel } from 'material-ui/Input';
+import { ListItemText } from 'material-ui/List';
+import { FormControl } from 'material-ui/Form';
+
 import '../App.css';
 
 const styles = theme => ({
@@ -43,7 +49,25 @@ class GetSalaries extends Component {
     this.state = {
       salaries: [],
       openDialog: false,
-      selectedSalary: ''
+      selectedSalary: '',
+      userId: '',
+      projectId: '',
+      startMonth: '',
+      endMonth: '',
+      months: [
+        {id: 0, name: 'Styczeń'},
+        {id: 1, name: 'Luty'},
+        {id: 2, name: 'Marzec'},
+        {id: 3, name: 'Kwiecień'},
+        {id: 4, name: 'Maj'},
+        {id: 5, name: 'Czerwiec'},
+        {id: 6, name: 'Lipiec'},
+        {id: 7, name: 'Sierpień'},
+        {id: 8, name: 'Wrzesień'},
+        {id: 9, name: 'Październik'},
+        {id: 10, name: 'Listopad'},
+        {id: 11, name: 'Grudzień'}
+      ]
     }
   }
 
@@ -58,7 +82,16 @@ class GetSalaries extends Component {
   }
 
   componentDidMount() {
-    fetch('https://reactmanagebe.herokuapp.com/api/salaries', {
+    this.setState({isLoading: true})
+    return Promise.all([
+      this.fetchSalaries(),
+      this.fetchUsers(),
+      this.fetchProjects()
+    ]).then(x => this.setState({isLoading: false}))
+  }
+
+  fetchSalaries = () => {
+    return fetch('https://reactmanagebe.herokuapp.com/api/salaries', {
       credentials: 'include'
     })
       .then( response => response.json())
@@ -73,11 +106,32 @@ class GetSalaries extends Component {
           this.setState({logged: data.logged})
           this.setState({isAdmin: false})
         }
+      }).catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
       })
+  }
+
+  fetchUsers = () => {
+    return fetch('https://reactmanagebe.herokuapp.com/api/users', {
+      credentials: 'include'
+    }).then(x => x.json())
+      .then(data => this.setState({users: data.users.sort((a,b) => a.name > b.name)}))
       .catch(err => {
         if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
       })
   }
+
+  fetchProjects = () => {
+    return fetch('https://reactmanagebe.herokuapp.com/api/projects', {
+      credentials: 'include'
+    }).then(x => x.json())
+      .then(data => this.setState({projects: data.projects.sort((a,b) => a.name > b.name)}))
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
+      })
+  }
+
+
   handleOpen = (salary) => {
     this.setState({ selectedSalary: salary})
     this.setState({ openDialog: true });
@@ -85,6 +139,12 @@ class GetSalaries extends Component {
 
   handleClose = () => {
     this.setState({ openDialog: false });
+  };
+
+  handleChange = name => event => {
+    this.setState({
+      [name]: event.target.value,
+    });
   };
 
   descriptionFunction = (description) => {
@@ -118,6 +178,7 @@ class GetSalaries extends Component {
     )
   }
 
+  
   render () {
     const { salaries } = this.state
     const { isLoading } = this.state
@@ -147,6 +208,78 @@ class GetSalaries extends Component {
           
           {this.disableButtonFunction(buttonDisable)}
 
+          <FormControl style={{minWidth:166, maxWidth: 166}}>
+            <InputLabel htmlFor="users-simple"> Odbiorca </InputLabel>
+            <Select
+              value={this.state.userId}
+              onChange={this.handleChange('userId')}
+              inputProps={{
+                name: 'users',
+                id: 'users-simple',
+              }}
+            >
+              {this.state.users.map(user => (
+                <MenuItem key = {user._id} value = {user._id}>
+                  <ListItemText primary = {user.name + ' ' + user.surname} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl style={{minWidth:166, maxWidth: 166}}>
+            <InputLabel htmlFor="projects-simple"> Projekt </InputLabel>
+            <Select
+              value={this.state.projectId}
+              onChange={this.handleChange('projectId')}
+              inputProps={{
+                name: 'projects',
+                id: 'projects-simple',
+              }}
+            >
+              {this.state.projects.map(project => (
+                  <MenuItem key = {project._id} value = {project._id}>
+                    <ListItemText primary = {project.name } />
+                  </MenuItem>
+                )
+              )}
+            </Select>
+          </FormControl>
+
+          <FormControl style={{minWidth:166, maxWidth: 166}}>
+            <InputLabel htmlFor="startMonth-simple"> Od </InputLabel>
+            <Select
+              value={this.state.startMonth}
+              onChange={this.handleChange('startMonth')}
+              inputProps={{
+                name: 'startMonth',
+                id: 'startMonth-simple',
+              }}
+            >
+              {this.state.months.map(month => (
+                <MenuItem key = {month._id} value = {month._id}>
+                  <ListItemText primary = {month.name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl style={{minWidth:166, maxWidth: 166}}>
+            <InputLabel htmlFor="endMonth-simple"> Do </InputLabel>
+            <Select
+              value={this.state.endMonth}
+              onChange={this.handleChange('endMonth')}
+              inputProps={{
+                name: 'endMonth',
+                id: 'endMonth-simple',
+              }}
+            >
+              {this.state.months.map(month => (
+                <MenuItem key = {month._id} value = {month._id}>
+                  <ListItemText primary = {month.name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         <Paper className={styles.root}>
           <Table className={styles.table}>
             <TableHead>
