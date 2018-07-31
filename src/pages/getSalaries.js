@@ -42,31 +42,36 @@ const styles = theme => ({
   }
 });
 
+const obj = {}
 
 class GetSalaries extends Component {
+  
   constructor(props) {
     super(props);
     this.state = {
       salaries: [],
       openDialog: false,
+      users: [{_id: 0, name: 'Wyczyść', surname: ''}],
+      projects: [{_id: 0, name: 'Wyczyść'}],
       selectedSalary: '',
       userId: '',
       projectId: '',
       startMonth: '',
       endMonth: '',
       months: [
-        {id: 0, name: 'Styczeń'},
-        {id: 1, name: 'Luty'},
-        {id: 2, name: 'Marzec'},
-        {id: 3, name: 'Kwiecień'},
-        {id: 4, name: 'Maj'},
-        {id: 5, name: 'Czerwiec'},
-        {id: 6, name: 'Lipiec'},
-        {id: 7, name: 'Sierpień'},
-        {id: 8, name: 'Wrzesień'},
-        {id: 9, name: 'Październik'},
-        {id: 10, name: 'Listopad'},
-        {id: 11, name: 'Grudzień'}
+        {id: 0, name: 'Wyczyść'},
+        {id: 1, name: 'Styczeń'},
+        {id: 2, name: 'Luty'},
+        {id: 3, name: 'Marzec'},
+        {id: 4, name: 'Kwiecień'},
+        {id: 5, name: 'Maj'},
+        {id: 6, name: 'Czerwiec'},
+        {id: 7, name: 'Lipiec'},
+        {id: 8, name: 'Sierpień'},
+        {id: 9, name: 'Wrzesień'},
+        {id: 10, name: 'Październik'},
+        {id: 11, name: 'Listopad'},
+        {id: 12, name: 'Grudzień'}
       ]
     }
   }
@@ -115,7 +120,10 @@ class GetSalaries extends Component {
     return fetch('https://reactmanagebe.herokuapp.com/api/users', {
       credentials: 'include'
     }).then(x => x.json())
-      .then(data => this.setState({users: data.users.sort((a,b) => a.name > b.name)}))
+      .then(data => {
+        const joinedUsers = this.state.users.concat(data.users.sort((a,b) => a.name > b.name))
+        return this.setState({ users: joinedUsers })
+      })
       .catch(err => {
         if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
       })
@@ -125,7 +133,10 @@ class GetSalaries extends Component {
     return fetch('https://reactmanagebe.herokuapp.com/api/projects', {
       credentials: 'include'
     }).then(x => x.json())
-      .then(data => this.setState({projects: data.projects.sort((a,b) => a.name > b.name)}))
+      .then(data => {
+        const joinedProjects = this.state.projects.concat(data.projects.sort((a,b) => a.name > b.name))
+        return this.setState({ projects: joinedProjects })
+      })
       .catch(err => {
         if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
       })
@@ -147,6 +158,41 @@ class GetSalaries extends Component {
     });
   };
 
+  handleChangeFilter = name => event => {
+    console.log(name, event.target.value);
+    
+    this.setState({
+      [name]: event.target.value,
+    });
+    
+    if (event.target.value === 0){
+      delete obj[name]
+      return fetch('https://reactmanagebe.herokuapp.com/api/salaries/filter', {
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        method: "POST",
+        body: JSON.stringify(obj)
+      }).then(x => x.json())
+        .then(data => this.setState({salaries: data}))      
+    } else {
+      obj[name] = event.target.value
+      return fetch('https://reactmanagebe.herokuapp.com/api/salaries/filter', {
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        method: "POST",
+        body: JSON.stringify(obj)
+      }).then(x => x.json())
+        .then(data => this.setState({salaries: data}))
+      }
+  };
+
+
   descriptionFunction = (description) => {
       if (description.length > 0) {
         description = description.substring(3, description.length - 4)
@@ -163,7 +209,7 @@ class GetSalaries extends Component {
     if (this.state.isAdmin == false){
       return(
         <div style = {{marginLeft: '94%', marginBottom: '0.5%'}}>
-          <Button color="primary" aria-label="add" className={styles.button} component={Link} to="/app/addSalaries" disabled="true">
+          <Button color="primary" aria-label="add" className={styles.button} style={{marginBottom:'-80px'}} component={Link} to="/app/addSalaries" disabled="true">
             <AddIcon />
           </Button>
         </div>
@@ -171,7 +217,7 @@ class GetSalaries extends Component {
     }
     return(
       <div style = {{marginLeft: '94%', marginBottom: '0.5%'}}>
-        <Button color="primary" aria-label="add" className={styles.button} component={Link} to="/app/addSalaries">
+        <Button color="primary" aria-label="add" className={styles.button} style={{marginBottom:'-80px'}} component={Link} to="/app/addSalaries">
           <AddIcon />
         </Button>
       </div>
@@ -212,7 +258,7 @@ class GetSalaries extends Component {
             <InputLabel htmlFor="users-simple"> Odbiorca </InputLabel>
             <Select
               value={this.state.userId}
-              onChange={this.handleChange('userId')}
+              onChange={this.handleChangeFilter('userId')}
               inputProps={{
                 name: 'users',
                 id: 'users-simple',
@@ -230,7 +276,7 @@ class GetSalaries extends Component {
             <InputLabel htmlFor="projects-simple"> Projekt </InputLabel>
             <Select
               value={this.state.projectId}
-              onChange={this.handleChange('projectId')}
+              onChange={this.handleChangeFilter('projectId')}
               inputProps={{
                 name: 'projects',
                 id: 'projects-simple',
@@ -249,14 +295,14 @@ class GetSalaries extends Component {
             <InputLabel htmlFor="startMonth-simple"> Od </InputLabel>
             <Select
               value={this.state.startMonth}
-              onChange={this.handleChange('startMonth')}
+              onChange={this.handleChangeFilter('startMonth')}
               inputProps={{
                 name: 'startMonth',
                 id: 'startMonth-simple',
               }}
             >
               {this.state.months.map(month => (
-                <MenuItem key = {month._id} value = {month._id}>
+                <MenuItem key = {month.id} value = {month.id}>
                   <ListItemText primary = {month.name} />
                 </MenuItem>
               ))}
@@ -267,14 +313,14 @@ class GetSalaries extends Component {
             <InputLabel htmlFor="endMonth-simple"> Do </InputLabel>
             <Select
               value={this.state.endMonth}
-              onChange={this.handleChange('endMonth')}
+              onChange={this.handleChangeFilter('endMonth')}
               inputProps={{
                 name: 'endMonth',
                 id: 'endMonth-simple',
               }}
             >
               {this.state.months.map(month => (
-                <MenuItem key = {month._id} value = {month._id}>
+                <MenuItem key = {month.id} value = {month.id}>
                   <ListItemText primary = {month.name} />
                 </MenuItem>
               ))}
