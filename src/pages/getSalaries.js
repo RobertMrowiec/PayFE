@@ -51,27 +51,27 @@ class GetSalaries extends Component {
     this.state = {
       salaries: [],
       openDialog: false,
-      users: [{_id: 0, name: 'Wyczyść', surname: ''}],
-      projects: [{_id: 0, name: 'Wyczyść'}],
+      users: [{_id: 33, name: 'Wyczyść', surname: ''}],
+      projects: [{_id: 33, name: 'Wyczyść'}],
       selectedSalary: '',
       userId: '',
       projectId: '',
       startMonth: '',
       endMonth: '',
       months: [
-        {id: 0, name: 'Wyczyść'},
-        {id: 1, name: 'Styczeń'},
-        {id: 2, name: 'Luty'},
-        {id: 3, name: 'Marzec'},
-        {id: 4, name: 'Kwiecień'},
-        {id: 5, name: 'Maj'},
-        {id: 6, name: 'Czerwiec'},
-        {id: 7, name: 'Lipiec'},
-        {id: 8, name: 'Sierpień'},
-        {id: 9, name: 'Wrzesień'},
-        {id: 10, name: 'Październik'},
-        {id: 11, name: 'Listopad'},
-        {id: 12, name: 'Grudzień'}
+        {id: 33, name: 'Wyczyść'},
+        {id: 0, name: 'Styczeń'},
+        {id: 1, name: 'Luty'},
+        {id: 2, name: 'Marzec'},
+        {id: 3, name: 'Kwiecień'},
+        {id: 4, name: 'Maj'},
+        {id: 5, name: 'Czerwiec'},
+        {id: 6, name: 'Lipiec'},
+        {id: 7, name: 'Sierpień'},
+        {id: 8, name: 'Wrzesień'},
+        {id: 9, name: 'Październik'},
+        {id: 10, name: 'Listopad'},
+        {id: 11, name: 'Grudzień'}
       ]
     }
   }
@@ -165,7 +165,7 @@ class GetSalaries extends Component {
       [name]: event.target.value,
     });
     
-    if (event.target.value === 0){
+    if (event.target.value === 33){
       delete obj[name]
       return fetch('https://reactmanagebe.herokuapp.com/api/salaries/filter', {
         credentials: 'include',
