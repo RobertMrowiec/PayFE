@@ -16,6 +16,12 @@ import Dialog, {
 import { Redirect } from 'react-router-dom';
 import { CircularProgress } from 'material-ui/Progress';
 import Checkbox from 'material-ui/Checkbox';
+import Select from 'material-ui/Select';
+import { MenuItem } from 'material-ui/Menu';
+import { InputLabel } from 'material-ui/Input';
+import { ListItemText } from 'material-ui/List';
+import { FormControl } from 'material-ui/Form';
+
 import '../App.css';
 
 const styles = theme => ({
@@ -36,14 +42,37 @@ const styles = theme => ({
   }
 });
 
+const obj = {}
 
 class GetSalaries extends Component {
+  
   constructor(props) {
     super(props);
     this.state = {
       salaries: [],
       openDialog: false,
-      selectedSalary: ''
+      users: [{_id: 0, name: 'Wyczyść', surname: ''}],
+      projects: [{_id: 0, name: 'Wyczyść'}],
+      selectedSalary: '',
+      userId: '',
+      projectId: '',
+      startMonth: '',
+      endMonth: '',
+      months: [
+        {id: 0, name: 'Wyczyść'},
+        {id: 1, name: 'Styczeń'},
+        {id: 2, name: 'Luty'},
+        {id: 3, name: 'Marzec'},
+        {id: 4, name: 'Kwiecień'},
+        {id: 5, name: 'Maj'},
+        {id: 6, name: 'Czerwiec'},
+        {id: 7, name: 'Lipiec'},
+        {id: 8, name: 'Sierpień'},
+        {id: 9, name: 'Wrzesień'},
+        {id: 10, name: 'Październik'},
+        {id: 11, name: 'Listopad'},
+        {id: 12, name: 'Grudzień'}
+      ]
     }
   }
 
@@ -58,7 +87,16 @@ class GetSalaries extends Component {
   }
 
   componentDidMount() {
-    fetch('https://reactmanagebe.herokuapp.com/api/salaries', {
+    this.setState({isLoading: true})
+    return Promise.all([
+      this.fetchSalaries(),
+      this.fetchUsers(),
+      this.fetchProjects()
+    ]).then(x => this.setState({isLoading: false}))
+  }
+
+  fetchSalaries = () => {
+    return fetch('https://reactmanagebe.herokuapp.com/api/salaries', {
       credentials: 'include'
     })
       .then( response => response.json())
@@ -73,11 +111,38 @@ class GetSalaries extends Component {
           this.setState({logged: data.logged})
           this.setState({isAdmin: false})
         }
+      }).catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
+      })
+  }
+
+  fetchUsers = () => {
+    return fetch('https://reactmanagebe.herokuapp.com/api/users', {
+      credentials: 'include'
+    }).then(x => x.json())
+      .then(data => {
+        const joinedUsers = this.state.users.concat(data.users.sort((a,b) => a.name > b.name))
+        return this.setState({ users: joinedUsers })
       })
       .catch(err => {
         if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
       })
   }
+
+  fetchProjects = () => {
+    return fetch('https://reactmanagebe.herokuapp.com/api/projects', {
+      credentials: 'include'
+    }).then(x => x.json())
+      .then(data => {
+        const joinedProjects = this.state.projects.concat(data.projects.sort((a,b) => a.name > b.name))
+        return this.setState({ projects: joinedProjects })
+      })
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
+      })
+  }
+
+
   handleOpen = (salary) => {
     this.setState({ selectedSalary: salary})
     this.setState({ openDialog: true });
@@ -86,6 +151,47 @@ class GetSalaries extends Component {
   handleClose = () => {
     this.setState({ openDialog: false });
   };
+
+  handleChange = name => event => {
+    this.setState({
+      [name]: event.target.value,
+    });
+  };
+
+  handleChangeFilter = name => event => {
+    console.log(name, event.target.value);
+    
+    this.setState({
+      [name]: event.target.value,
+    });
+    
+    if (event.target.value === 0){
+      delete obj[name]
+      return fetch('https://reactmanagebe.herokuapp.com/api/salaries/filter', {
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        method: "POST",
+        body: JSON.stringify(obj)
+      }).then(x => x.json())
+        .then(data => this.setState({salaries: data}))      
+    } else {
+      obj[name] = event.target.value
+      return fetch('https://reactmanagebe.herokuapp.com/api/salaries/filter', {
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        method: "POST",
+        body: JSON.stringify(obj)
+      }).then(x => x.json())
+        .then(data => this.setState({salaries: data}))
+      }
+  };
+
 
   descriptionFunction = (description) => {
       if (description.length > 0) {
@@ -103,7 +209,7 @@ class GetSalaries extends Component {
     if (this.state.isAdmin == false){
       return(
         <div style = {{marginLeft: '94%', marginBottom: '0.5%'}}>
-          <Button color="primary" aria-label="add" className={styles.button} component={Link} to="/app/addSalaries" disabled="true">
+          <Button color="primary" aria-label="add" className={styles.button} style={{marginBottom:'-80px'}} component={Link} to="/app/addSalaries" disabled="true">
             <AddIcon />
           </Button>
         </div>
@@ -111,13 +217,14 @@ class GetSalaries extends Component {
     }
     return(
       <div style = {{marginLeft: '94%', marginBottom: '0.5%'}}>
-        <Button color="primary" aria-label="add" className={styles.button} component={Link} to="/app/addSalaries">
+        <Button color="primary" aria-label="add" className={styles.button} style={{marginBottom:'-80px'}} component={Link} to="/app/addSalaries">
           <AddIcon />
         </Button>
       </div>
     )
   }
 
+  
   render () {
     const { salaries } = this.state
     const { isLoading } = this.state
@@ -147,6 +254,78 @@ class GetSalaries extends Component {
           
           {this.disableButtonFunction(buttonDisable)}
 
+          <FormControl style={{minWidth:166, maxWidth: 166}}>
+            <InputLabel htmlFor="users-simple"> Odbiorca </InputLabel>
+            <Select
+              value={this.state.userId}
+              onChange={this.handleChangeFilter('userId')}
+              inputProps={{
+                name: 'users',
+                id: 'users-simple',
+              }}
+            >
+              {this.state.users.map(user => (
+                <MenuItem key = {user._id} value = {user._id}>
+                  <ListItemText primary = {user.name + ' ' + user.surname} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl style={{minWidth:166, maxWidth: 166}}>
+            <InputLabel htmlFor="projects-simple"> Projekt </InputLabel>
+            <Select
+              value={this.state.projectId}
+              onChange={this.handleChangeFilter('projectId')}
+              inputProps={{
+                name: 'projects',
+                id: 'projects-simple',
+              }}
+            >
+              {this.state.projects.map(project => (
+                  <MenuItem key = {project._id} value = {project._id}>
+                    <ListItemText primary = {project.name } />
+                  </MenuItem>
+                )
+              )}
+            </Select>
+          </FormControl>
+
+          <FormControl style={{minWidth:166, maxWidth: 166}}>
+            <InputLabel htmlFor="startMonth-simple"> Od </InputLabel>
+            <Select
+              value={this.state.startMonth}
+              onChange={this.handleChangeFilter('startMonth')}
+              inputProps={{
+                name: 'startMonth',
+                id: 'startMonth-simple',
+              }}
+            >
+              {this.state.months.map(month => (
+                <MenuItem key = {month.id} value = {month.id}>
+                  <ListItemText primary = {month.name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl style={{minWidth:166, maxWidth: 166}}>
+            <InputLabel htmlFor="endMonth-simple"> Do </InputLabel>
+            <Select
+              value={this.state.endMonth}
+              onChange={this.handleChangeFilter('endMonth')}
+              inputProps={{
+                name: 'endMonth',
+                id: 'endMonth-simple',
+              }}
+            >
+              {this.state.months.map(month => (
+                <MenuItem key = {month.id} value = {month.id}>
+                  <ListItemText primary = {month.name} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         <Paper className={styles.root}>
           <Table className={styles.table}>
             <TableHead>

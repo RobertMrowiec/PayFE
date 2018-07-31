@@ -8,6 +8,8 @@ import { withStyles } from 'material-ui/styles';
 import Button from 'material-ui/Button';
 import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 import Paper from 'material-ui/Paper';
+import Checkbox from 'material-ui/Checkbox';
+import Moment from 'react-moment';
 
 const styles = theme => ({
   typo: {
@@ -64,7 +66,13 @@ class Home extends Component {
       this.twoMonthsAgo(),
       this.projectsActualMonth(),
       this.projectsMonthAgo(),
-      this.projectsTwoMonthsAgo()
+      this.projectsTwoMonthsAgo(),
+      this.salariesPotentially(),
+      this.salariesPotentiallyMonthAgo(),
+      this.salariesPotentiallyTwoMonthsAgo(),
+      this.salariesPerson(),
+      this.salariesPersonMonthAgo(),
+      this.salariesPersonTwoMonthsAgo()
     ]).then(() => this.setState({isLoading: false}))
   }
   
@@ -139,6 +147,84 @@ class Home extends Component {
       })
   }
 
+  salariesPotentially() {
+    return fetch('https://reactmanagebe.herokuapp.com/api/dashboards/salaries/potentially', {credentials: 'include'})
+      .then( response => response.json())
+      .then( data => {
+        return this.setState({salariesPotentially: data})
+      })
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
+      })
+  }
+
+  salariesPotentiallyMonthAgo() {
+    return fetch('https://reactmanagebe.herokuapp.com/api/dashboards/salaries/potentially/months/one', {credentials: 'include'})
+      .then( response => response.json())
+      .then( data => {
+        return this.setState({salariesPotentiallyMonthAgo: data})
+      })
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
+      })
+  }
+
+  salariesPotentiallyTwoMonthsAgo() {
+    return fetch('https://reactmanagebe.herokuapp.com/api/dashboards/salaries/potentially/months/two', {credentials: 'include'})
+      .then( response => response.json())
+      .then( data => {
+        return this.setState({salariesPotentiallyTwoMonthsAgo: data})
+      })
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
+      })
+  }
+
+  salariesPerson() {
+    return fetch('https://reactmanagebe.herokuapp.com/api/dashboards/person', {credentials: 'include'})
+      .then( response => response.json())
+      .then( data => {
+        return this.setState({salariesPerson: data})
+      })
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
+      })
+  }
+
+  salariesPersonMonthAgo() {
+    return fetch('https://reactmanagebe.herokuapp.com/api/dashboards/person/months/one', {credentials: 'include'})
+      .then( response => response.json())
+      .then( data => {
+        return this.setState({salariesPersonMonthAgo: data})
+      })
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
+      })
+  }
+
+  salariesPersonTwoMonthsAgo() {
+    return fetch('https://reactmanagebe.herokuapp.com/api/dashboards/person/months/two', {credentials: 'include'})
+      .then( response => response.json())
+      .then( data => {
+        return this.setState({salariesPersonTwoMonthsAgo: data})
+      })
+      .catch(err => {
+        if (err == 'TypeError: Failed to fetch') return this.setState({redirectLogin: true})
+      })
+  }
+  
+  descriptionFunction = (description) => {
+    if (description.length > 0) {
+      description = description.substring(3, description.length - 4)
+      if (description.length > 150) {
+        return description.substring(0, 150) + '...'
+      } else {
+        return description
+      }
+    } 
+    return
+}
+
   render(){
 
     const dashboardData = (labels, firstLabel, firstData, secondLabel, secondData) => {
@@ -169,7 +255,7 @@ class Home extends Component {
         return <Redirect to={{pathname: '/login' }}/>
       }
 
-      if (actualState.isLoading) {
+      if (actualState.isLoading){
         return (
         <CircularProgress style={{
           'width': '60px',
@@ -180,7 +266,7 @@ class Home extends Component {
         )
       }
 
-      if (actualState.sumData) {
+      if (actualState.sumData){
         return (
           <div style={{textAlign:'center', marginTop:'15%'}}>
             <Typography variant = 'display2' className={styles.typo}> W tym miesiącu zarobiłeś: {actualState.sum.toFixed(2)} zł </Typography>
@@ -193,10 +279,11 @@ class Home extends Component {
           <div>
             <div>
               <Button style={{float:'left', size: "10px"}} color="primary" onClick={() => ChangePage('ProjectsMonthAgo', true)}>
-                Poprzedni miesiąc
+                Miesiąc w tył
               </Button>
               <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Dashboard', true)}> Dashboard </Button> 
               <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Developers', true)}> Programiści </Button> 
+              <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Potentially', true)}> Wypłaty Potencjalne</Button> 
               <br/>
               <br/>
               <br/>
@@ -239,6 +326,7 @@ class Home extends Component {
               </Button>
               <br/>
               <br/>
+              <br/>
               <Paper>
                 <Table>
                   <TableHead>
@@ -275,6 +363,7 @@ class Home extends Component {
               </Button>
               <br/>
               <br/>
+              <br/>
               <Paper>
                 <Table>
                   <TableHead>
@@ -301,6 +390,7 @@ class Home extends Component {
           </div>
         )
       }
+
       if (actualState.page && actualState.page.pageDoubleLeft){
         return (
           <div>
@@ -328,12 +418,337 @@ class Home extends Component {
         )
       }
       
+      if (actualState.page && actualState.page.pagePotentially){
+        return (
+          <div>
+            <div>
+              <Button style={{float:'left', size: "10px"}} color="primary" onClick={() => ChangePage('PotentiallyMonthAgo', true)}>
+                Miesiąc w tył
+              </Button>
+              <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Projects', true)}> Projekty </Button> 
+              <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Developers', true)}> Programiści </Button> 
+              <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Dashboard', true)}> Dashboard </Button> 
+              <br/>
+              <br/>
+              <br/>
+              <Paper>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                    <TableCell>ID</TableCell>
+                    <TableCell>Odbiorca</TableCell>
+                    <TableCell>Projekt</TableCell>
+                    <TableCell>Tytuł</TableCell>
+                    <TableCell>Kwota</TableCell>
+                    <TableCell>Potencjalna</TableCell>
+                    <TableCell>Data</TableCell>
+                    <TableCell>Komentarz</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {this.state.salariesPotentially.map((salary, i) => {
+                      if (!salary.projectId){
+                        salary.projectId = {name: ''}
+                      }
+                      if (!salary.userId){
+                        salary.userId = {name: '', surname: ''}
+                      }
+                      return (
+                        <TableRow key={i}>
+                          <TableCell>{i+1}</TableCell>
+                          <TableCell>{salary.userId.name} {salary.userId.surname}</TableCell>
+                          <TableCell>{salary.projectId.name}</TableCell>
+                          <TableCell>{salary.title}</TableCell>
+                          <TableCell className="currencyTable">{salary.amount.toFixed(2)} zł</TableCell>
+                          <TableCell>
+                            <Checkbox
+                              checked={salary.potentially}
+                              color="primary"
+                            />
+                          </TableCell>
+
+                          <TableCell>
+                            <Moment format="YYYY/MM/DD hh:mm">
+                              {salary.date}
+                            </Moment>
+                          </TableCell>
+
+                          <TableCell>
+                            {this.descriptionFunction(salary.description)}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </Paper>
+            </div>
+          </div>
+        )
+      }
+
+      if (actualState.page && actualState.page.pagePotentiallyMonthAgo){
+        return (
+          <div>
+            <div>
+              <Button style={{float:'left', size: "10px"}} color="primary" onClick={() => ChangePage('PotentiallyTwoMonthsAgo', true)}>
+                Miesiąc w tył
+              </Button>
+              <Button style={{float:'right', size: "10px"}} color="primary" onClick={() => ChangePage('Potentially', true)}>
+                Aktualny miesiąc
+              </Button>
+              <br/>
+              <br/>
+              <br/>
+              <Paper>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                    <TableCell>ID</TableCell>
+                    <TableCell>Odbiorca</TableCell>
+                    <TableCell>Projekt</TableCell>
+                    <TableCell>Tytuł</TableCell>
+                    <TableCell>Kwota</TableCell>
+                    <TableCell>Potencjalna</TableCell>
+                    <TableCell>Data</TableCell>
+                    <TableCell>Komentarz</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {this.state.salariesPotentiallyMonthAgo.map((salary, i) => {
+                      if (!salary.projectId){
+                        salary.projectId = {name: ''}
+                      }
+                      if (!salary.userId){
+                        salary.userId = {name: '', surname: ''}
+                      }
+                      return (
+                        <TableRow key={i}>
+                          <TableCell>{i+1}</TableCell>
+                          <TableCell>{salary.userId.name} {salary.userId.surname}</TableCell>
+                          <TableCell>{salary.projectId.name}</TableCell>
+                          <TableCell>{salary.title}</TableCell>
+                          <TableCell className="currencyTable">{salary.amount.toFixed(2)} zł</TableCell>
+                          <TableCell>
+                            <Checkbox
+                              checked={salary.potentially}
+                              color="primary"
+                            />
+                          </TableCell>
+
+                          <TableCell>
+                            <Moment format="YYYY/MM/DD hh:mm">
+                              {salary.date}
+                            </Moment>
+                          </TableCell>
+
+                          <TableCell>
+                            {this.descriptionFunction(salary.description)}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </Paper>
+            </div>
+          </div>
+        )
+      }
+
+      if (actualState.page && actualState.page.pagePotentiallyTwoMonthsAgo){
+        return (
+          <div>
+            <div>
+              <Button style={{float:'right', size: "10px"}} color="primary" onClick={() => ChangePage('PotentiallyMonthAgo', true)}>
+                Miesiąc w przód
+              </Button>
+              <br/>
+              <br/>
+              <br/>
+              <Paper>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                    <TableCell>ID</TableCell>
+                    <TableCell>Odbiorca</TableCell>
+                    <TableCell>Projekt</TableCell>
+                    <TableCell>Tytuł</TableCell>
+                    <TableCell>Kwota</TableCell>
+                    <TableCell>Data</TableCell>
+                    <TableCell>Komentarz</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {this.state.salariesPotentiallyTwoMonthsAgo.map((salary, i) => {
+                      if (!salary.projectId){
+                        salary.projectId = {name: ''}
+                      }
+                      if (!salary.userId){
+                        salary.userId = {name: '', surname: ''}
+                      }
+                      return (
+                        <TableRow key={i}>
+                          <TableCell>{i+1}</TableCell>
+                          <TableCell>{salary.userId.name} {salary.userId.surname}</TableCell>
+                          <TableCell>{salary.projectId.name}</TableCell>
+                          <TableCell>{salary.title}</TableCell>
+                          <TableCell className="currencyTable">{salary.amount.toFixed(2)} zł</TableCell>
+                          <TableCell>
+                            <Moment format="YYYY/MM/DD hh:mm">
+                              {salary.date}
+                            </Moment>
+                          </TableCell>
+                          <TableCell>
+                            {this.descriptionFunction(salary.description)}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </Paper>
+            </div>
+          </div>
+        )
+      }
+
+      if (actualState.page && actualState.page.pageDevelopers){
+        return (
+          <div>
+            <div>
+              <Button style={{float:'left', size: "10px"}} color="primary" onClick={() => ChangePage('DevelopersMonthAgo', true)}>
+                Miesiąc w tył
+              </Button>
+              <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Projects', true)}> Projekty </Button> 
+              <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Dashboard', true)}> Dashboard </Button> 
+              <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Potentially', true)}> Wypłaty potencjalne </Button> 
+              <br/>
+              <br/>
+              <br/>
+              <Paper>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>ID</TableCell>
+                      <TableCell>Imie</TableCell>
+                      <TableCell>Nazwisko</TableCell>
+                      <TableCell>Kwota</TableCell>
+                      <TableCell>Ilość</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {this.state.salariesPerson.map((salary, i) => {
+                      return (
+                        <TableRow key={i}>
+                          <TableCell>{i+1}</TableCell>
+                          <TableCell>{salary.name[0]}</TableCell>
+                          <TableCell>{salary.surname[0]}</TableCell>
+                          <TableCell>{salary.sum}</TableCell>
+                          <TableCell>{salary.count}</TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </Paper>
+            </div>
+          </div>
+        )
+      }
+
+      if (actualState.page && actualState.page.pageDevelopersMonthAgo){
+        return (
+          <div>
+            <div>
+              <Button style={{float:'left', size: "10px"}} color="primary" onClick={() => ChangePage('DevelopersTwoMonthsAgo', true)}>
+                Miesiąc w tył
+              </Button>
+              <Button style={{float:'right', size: "10px"}} color="primary" onClick={() => ChangePage('Developers', true)}>
+                Aktualny miesiąc
+              </Button>
+              <br/>
+              <br/>
+              <br/>
+              <Paper>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>ID</TableCell>
+                      <TableCell>Imie</TableCell>
+                      <TableCell>Nazwisko</TableCell>
+                      <TableCell>Kwota</TableCell>
+                      <TableCell>Ilość</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {this.state.salariesPersonMonthAgo.map((salary, i) => {
+                      return (
+                        <TableRow key={i}>
+                          <TableCell>{i+1}</TableCell>
+                          <TableCell>{salary.name[0]}</TableCell>
+                          <TableCell>{salary.surname[0]}</TableCell>
+                          <TableCell>{salary.sum}</TableCell>
+                          <TableCell>{salary.count}</TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </Paper>
+            </div>
+          </div>
+        )
+      }
+
+      if (actualState.page && actualState.page.pageDevelopersTwoMonthsAgo){
+        return (
+          <div>
+            <div>
+              <Button style={{float:'right', size: "10px"}} color="primary" onClick={() => ChangePage('DevelopersMonthAgo', true)}>
+                Miesiąc w przód
+              </Button>
+              <br/>
+              <br/>
+              <br/>
+              <Paper>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>ID</TableCell>
+                      <TableCell>Imie</TableCell>
+                      <TableCell>Nazwisko</TableCell>
+                      <TableCell>Kwota</TableCell>
+                      <TableCell>Ilość</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {this.state.salariesPersonTwoMonthsAgo.map((salary, i) => {
+                      return (
+                        <TableRow key={i}>
+                          <TableCell>{i+1}</TableCell>
+                          <TableCell>{salary.name[0]}</TableCell>
+                          <TableCell>{salary.surname[0]}</TableCell>
+                          <TableCell>{salary.sum}</TableCell>
+                          <TableCell>{salary.count}</TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </Paper>
+            </div>
+          </div>
+        )
+      }
+
       return (
         <div>
           <div>
             <Button color="primary" style={{float:'left'}} onClick={() => ChangePage('Left', true)}> Miesiąc w tył </Button> 
             <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Projects', true)}> Projekty </Button> 
             <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Developers', true)}> Programiści </Button> 
+            <Button color="primary" style={{float:'right'}} onClick={() => ChangePage('Potentially', true)}> Wypłaty Potencjalne</Button> 
           </div>
           
           <Line data={dashboardData(actualState.users, "Zarobki z tego miesiąca", actualState.salaries, 'Potencjalne zarobki z tego miesiąca', actualState.potentiallySalaries)} height={140}/>
