@@ -201,15 +201,15 @@ class GetSalaries extends Component {
         } else {
           return description
         }
-      } 
+      }
       return
   }
 
   disableButtonFunction(button) {
     if (this.state.isAdmin == false){
-      return(
+      return (
         <div style = {{marginLeft: '94%', marginBottom: '0.5%'}}>
-          <Button color="primary" aria-label="add" className={styles.button} style={{marginBottom:'-80px'}} component={Link} to="/app/addSalaries" disabled="true">
+          <Button color="primary" aria-label="add" className={styles.button} component={Link} to="/app/addSalaries" disabled="true">
             <AddIcon />
           </Button>
         </div>

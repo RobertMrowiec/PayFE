@@ -260,13 +260,6 @@ class GetProjects extends Component {
                       <TableCell>{project.peoples}</TableCell>
                       <TableCell>{project.salaries}</TableCell>
                       <TableCell>
-
-                        <Button size='small' color="primary" aria-label="edit" style={{width:'35px', height:'23px'}} href={'/app/projectInfo/salaries/' +`${project._id}`}>
-                          <MoneyIcon />
-                        </Button>
-
-                      </TableCell>
-                      <TableCell>
   
                         <Button size='small' color="primary" aria-label="edit" style={{width:'35px', height:'23px'}} disabled='true' href={'/app/editProjects/' +`${project._id}`}>
                           <ModeEditIcon />
